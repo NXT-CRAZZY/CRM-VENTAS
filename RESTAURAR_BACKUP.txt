@@ -1,0 +1,68 @@
+INSTRUCCIONES PARA RESTAURAR EL BACKUP EN LA LAPTOP
+=====================================================
+
+1. ASEGURATE DE QUE DOCKER ESTE CORRIENDO
+-----------------------------------------
+Abre Docker Desktop y espera a que este listo.
+
+2. HAZ PULL DEL REPOSITORIO
+---------------------------
+Abre PowerShell en la carpeta del proyecto y ejecuta:
+
+    cd C:\Users\<tu-usuario>\Documents\CRM-VENTAS
+    git pull origin main
+
+Esto descargara el archivo crm_backup.dump a tu laptop.
+
+3. VERIFICA QUE LA BASE DE DATOS ESTE CORRIENDO
+-----------------------------------------------
+Ejecuta:
+
+    docker compose -f infra/compose.dev.yml ps
+
+Debes ver el servicio db con estado healthy o running.
+
+4. COPIA EL BACKUP AL CONTENEDOR DE POSTGRES
+--------------------------------------------
+El nombre del contenedor puede ser infra-db-1 o crm-dataservice-dev-db-1.
+Primero verificalo con:
+
+    docker ps
+
+Luego copia el archivo (reemplaza infra-db-1 si tu contenedor tiene otro nombre):
+
+    docker cp crm_backup.dump infra-db-1:/tmp/crm_backup.dump
+
+5. RESTAURA LA BASE DE DATOS
+----------------------------
+Ejecuta:
+
+    docker exec infra-db-1 pg_restore -U crm -d crm --clean --if-exists /tmp/crm_backup.dump
+
+Este comando borrara los datos actuales de la base crm y restaurara los del backup.
+
+6. VERIFICA QUE TODO FUNCIONE
+-----------------------------
+Abre el navegador y ve a:
+
+    http://localhost:5173
+
+Inicia sesion con:
+    Email: admin@dataservice.pe
+    Contrasena: la que configuraste en el archivo .env (INITIAL_ADMIN_PASSWORD)
+
+Ve a la seccion Alertas u otra parte del CRM y revisa que los datos aparezcan.
+
+7. (OPCIONAL) BORRA EL BACKUP DEL REPO DE GITHUB
+-------------------------------------------------
+Una vez verificado todo, para no dejar datos en GitHub ejecuta:
+
+    git rm crm_backup.dump
+    git commit -m "chore: eliminar backup de base de datos"
+    git push origin main
+
+NOTA IMPORTANTE
+---------------
+Este backup contiene datos de desarrollo. Subirlo a GitHub no es una buena practica,
+pero se hizo en este caso porque el archivo pesa muy poco (0.14 MB) y facilita la
+migracion. Considera usar USB o nube para backups futuros.
