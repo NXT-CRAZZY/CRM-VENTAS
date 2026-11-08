@@ -1,0 +1,882 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Manual de Usuario · CRM DATA SERVICE</title>
+<style>
+  :root{
+    --brand:#e8542a;
+    --brand-dark:#c8401b;
+    --brand-soft:#fdf1ec;
+    --ink:#0f0f12;
+    --z900:#18181b;
+    --z700:#3f3f46;
+    --z600:#52525b;
+    --z500:#71717a;
+    --z400:#a1a1aa;
+    --z300:#d4d4d8;
+    --z200:#e4e4e7;
+    --z100:#f4f4f5;
+    --z50:#fafafa;
+    --blue:#1d4ed8;
+    --blue-soft:#eff6ff;
+    --amber:#b45309;
+    --amber-soft:#fffbeb;
+    --green:#15803d;
+    --green-soft:#f0fdf4;
+  }
+  @page{ size:A4; }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    font-family:"Segoe UI","Inter",Arial,Helvetica,sans-serif;
+    font-size:10.1pt;
+    line-height:1.5;
+    color:#27272a;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+  p{ margin:0 0 6pt; }
+  strong{ color:var(--z900); }
+  a{ color:var(--brand-dark); text-decoration:none; }
+  ul,ol{ margin:0 0 7pt; padding-left:16pt; }
+  li{ margin:0 0 2.5pt; }
+
+  /* ---------- Portada ---------- */
+  .cover{
+    padding:20mm 18mm 16mm;
+    min-height:278mm;
+    display:flex;
+    flex-direction:column;
+    page-break-after:always;
+    position:relative;
+    overflow:hidden;
+  }
+  .cover .accent{
+    position:absolute;
+    top:0; left:0;
+    width:100%; height:7mm;
+    background:linear-gradient(90deg,var(--brand) 0%,#f08a3c 55%,#f6b26b 100%);
+  }
+  .cover .glow{
+    position:absolute;
+    right:-55mm; top:52mm;
+    width:150mm; height:150mm;
+    border-radius:50%;
+    background:radial-gradient(circle,rgba(232,84,42,.13),rgba(232,84,42,0) 70%);
+  }
+  .cover .logo{ width:62mm; height:auto; margin-bottom:26mm; position:relative; }
+  .cover .kicker{
+    font-size:10pt; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--brand); font-weight:700; margin-bottom:5mm; position:relative;
+  }
+  .cover h1{
+    font-size:38pt; line-height:1.02; letter-spacing:-.02em;
+    color:var(--z900); margin:0 0 5mm; font-weight:800; position:relative;
+  }
+  .cover h1 span{ color:var(--brand); }
+  .cover .sub{
+    font-size:14pt; color:var(--z700); max-width:120mm; position:relative;
+    margin-bottom:12mm; font-weight:400;
+  }
+  .cover .rule{ width:34mm; height:1.6mm; background:var(--brand); border-radius:2mm; margin-bottom:12mm; }
+  .cover .chips{ display:flex; flex-wrap:wrap; gap:2.5mm; max-width:150mm; position:relative; }
+  .cover .chip{
+    border:1px solid var(--z200); background:#fff;
+    border-radius:99px; padding:2mm 4mm; font-size:9pt; color:var(--z700); font-weight:600;
+  }
+  .cover .foot{
+    margin-top:auto; position:relative;
+    display:flex; justify-content:space-between; align-items:flex-end;
+    border-top:1px solid var(--z200); padding-top:5mm; font-size:9pt; color:var(--z500);
+  }
+  .cover .foot b{ color:var(--z700); }
+
+  /* ---------- Páginas ---------- */
+  .sheet{
+    padding:11mm 15mm 0;
+    page-break-before:always;
+    -webkit-box-decoration-break:clone;
+    box-decoration-break:clone;
+  }
+  .sheet.first{ page-break-before:auto; }
+  .kicker{
+    font-size:8.6pt; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--brand); font-weight:700; margin:2mm 0 2mm;
+  }
+  h1{
+    font-size:21pt; line-height:1.12; letter-spacing:-.015em;
+    color:var(--z900); margin:0 0 3mm; font-weight:800;
+  }
+  .lead{ font-size:10.8pt; color:var(--z600); margin:0 0 7mm; }
+  h2{
+    font-size:13pt; color:var(--z900); margin:8mm 0 3mm; font-weight:700;
+    display:flex; align-items:baseline; gap:2.5mm;
+    page-break-after:avoid;
+  }
+  h2 .n{
+    display:inline-flex; align-items:center; justify-content:center;
+    min-width:9mm; height:6.4mm; padding:0 2mm;
+    background:var(--brand); color:#fff; border-radius:1.6mm;
+    font-size:8.4pt; font-weight:700; letter-spacing:.02em;
+  }
+  h3{ font-size:10.6pt; color:var(--z900); margin:5mm 0 2mm; font-weight:700; page-break-after:avoid; }
+  .muted{ color:var(--z500); }
+  .small{ font-size:9pt; }
+
+  /* ---------- Figuras ---------- */
+  figure{
+    margin:3.5mm 0 5mm; page-break-inside:avoid;
+  }
+  figure img{
+    display:block; max-width:100%; max-height:88mm; width:auto; height:auto;
+    margin:0 auto;
+    border:1px solid var(--z200); border-radius:2.4mm;
+    box-shadow:0 1px 2px rgba(0,0,0,.05), 0 8px 18px rgba(0,0,0,.05);
+  }
+  figcaption{
+    margin-top:2.2mm; font-size:8.6pt; color:var(--z500); line-height:1.35;
+  }
+  figcaption b{ color:var(--z700); }
+  .figure-narrow{ max-width:118mm; margin-left:auto; margin-right:auto; }
+  .figure-phone{ margin-left:auto; margin-right:auto; }
+  .figure-phone img{ max-width:40mm; max-height:none; }
+  .figure-short img{ max-height:70mm; }
+
+  /* ---------- Callouts ---------- */
+  .callout{
+    border-radius:2mm; padding:3mm 4mm; margin:3.5mm 0 5mm;
+    border:1px solid var(--z200); background:var(--z50);
+    font-size:9.4pt; page-break-inside:avoid;
+  }
+  .callout .tag{
+    display:inline-block; font-size:7.8pt; font-weight:800; letter-spacing:.09em;
+    text-transform:uppercase; margin-right:2mm;
+  }
+  .callout.tip{ background:var(--brand-soft); border-color:#f6c9b8; }
+  .callout.tip .tag{ color:var(--brand-dark); }
+  .callout.info{ background:var(--blue-soft); border-color:#c7d7fe; }
+  .callout.info .tag{ color:var(--blue); }
+  .callout.warn{ background:var(--amber-soft); border-color:#fde68a; }
+  .callout.warn .tag{ color:var(--amber); }
+  .callout.ok{ background:var(--green-soft); border-color:#bbf7d0; }
+  .callout.ok .tag{ color:var(--green); }
+
+  /* ---------- Tablas ---------- */
+  table.tbl{
+    width:100%; border-collapse:collapse; margin:3mm 0 6mm;
+    font-size:9.1pt; page-break-inside:auto;
+  }
+  table.tbl th{
+    text-align:left; background:var(--z100); color:var(--z700);
+    font-size:8.2pt; letter-spacing:.05em; text-transform:uppercase;
+    padding:1.9mm 3mm; border-bottom:1px solid var(--z200); font-weight:700;
+  }
+  table.tbl td{
+    padding:1.9mm 3mm; border-bottom:1px solid var(--z100); vertical-align:top;
+  }
+  table.tbl tr{ page-break-inside:avoid; }
+  table.tbl td:first-child{ color:var(--z900); font-weight:600; width:34%; }
+
+  /* ---------- Pasos ---------- */
+  ol.steps{ list-style:none; counter-reset:s; padding-left:0; margin:2mm 0 5mm; }
+  ol.steps > li{
+    counter-increment:s; position:relative; padding-left:9mm; margin-bottom:2.6mm;
+  }
+  ol.steps > li::before{
+    content:counter(s);
+    position:absolute; left:0; top:-.3mm;
+    width:6mm; height:6mm; border-radius:50%;
+    background:var(--brand); color:#fff;
+    font-size:8.2pt; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  /* ---------- Índice ---------- */
+  .toc{ display:grid; grid-template-columns:1fr 1fr; gap:3mm 8mm; margin-top:4mm; }
+  .toc a{
+    display:flex; gap:3mm; align-items:flex-start;
+    padding:2.6mm 3mm; border:1px solid var(--z200); border-radius:2mm;
+    color:var(--z700); background:#fff; page-break-inside:avoid;
+  }
+  .toc .num{
+    font-size:8.6pt; font-weight:800; color:var(--brand);
+    min-width:6mm; padding-top:.2mm;
+  }
+  .toc a > span:last-child{ display:flex; flex-direction:column; gap:.8mm; min-width:0; }
+  .toc .tt{ display:block; font-size:9.4pt; font-weight:700; color:var(--z900); line-height:1.25; }
+  .toc .dd{ display:block; font-size:8.2pt; color:var(--z500); line-height:1.3; margin-top:.2mm; }
+
+  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:6mm; }
+  .keep{ page-break-inside:avoid; }
+  .page-break{ page-break-before:always; }
+
+  .badge{
+    display:inline-block; padding:.6mm 2mm; border-radius:99px;
+    font-size:8pt; font-weight:700; background:var(--z100); color:var(--z700);
+  }
+  .badge.brand{ background:var(--brand-soft); color:var(--brand-dark); }
+  .badge.green{ background:var(--green-soft); color:var(--green); }
+
+  /* Encabezado de sección más compacto */
+  .section-head{ border-bottom:1px solid var(--z200); padding-bottom:4mm; margin-bottom:5mm; }
+  .section-head .kicker{ margin-top:0; }
+  .section-head h1{ margin-bottom:2mm; }
+  .section-head .lead{ margin-bottom:0; }
+</style>
+</head>
+<body>
+
+<!-- ================= PORTADA ================= -->
+<div class="cover">
+  <div class="accent"></div>
+  <div class="glow"></div>
+  <img class="logo" src="../brand/DSCONT_CRM.png" alt="DSCONT Software">
+  <div class="kicker">Guía oficial de uso</div>
+  <h1>Manual de<br><span>Usuario</span></h1>
+  <p class="sub">CRM Comercial DATA SERVICE<br>Seguimiento, cotizaciones y ventas en un solo lugar.</p>
+  <div class="rule"></div>
+  <div class="chips">
+    <span class="chip">Prospectos</span>
+    <span class="chip">Pipeline</span>
+    <span class="chip">Tareas</span>
+    <span class="chip">Cotizaciones</span>
+    <span class="chip">Informe semanal</span>
+    <span class="chip">Alertas</span>
+    <span class="chip">Productos</span>
+    <span class="chip">Administración</span>
+  </div>
+  <div class="foot">
+    <div><b>Versión 1.0</b> · Noviembre 2026</div>
+    <div>Uso interno · DATA SERVICE</div>
+  </div>
+</div>
+
+<!-- ================= ÍNDICE ================= -->
+<section class="sheet first">
+  <div class="section-head">
+    <div class="kicker">Antes de empezar</div>
+    <h1>Cómo usar este manual</h1>
+    <p class="lead">Una guía práctica, pensada para consultarse rápido. Cada módulo explica qué hace, cómo se usa y qué conviene evitar.</p>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h3 style="margin-top:0">Qué encontrarás</h3>
+      <ul>
+        <li><strong>Pasos numerados</strong> para las tareas más frecuentes.</li>
+        <li><strong>Capturas reales</strong> del sistema con datos de ejemplo.</li>
+        <li><strong>Consejos</strong> y <strong>advertencias</strong> para trabajar con orden.</li>
+        <li><strong>Preguntas frecuentes</strong> al final del documento.</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="margin-top:0">Cómo leer los avisos</h3>
+      <div class="callout tip" style="margin-top:0"><span class="tag">Consejo</span>Una buena práctica que ahorra tiempo o evita errores.</div>
+      <div class="callout warn"><span class="tag">Importante</span>Algo que debes tener en cuenta antes de continuar.</div>
+      <div class="callout info"><span class="tag">Dato</span>Información útil sobre cómo funciona el sistema.</div>
+    </div>
+  </div>
+
+  <h2 style="margin-top:9mm">Contenido</h2>
+  <div class="toc">
+    <a href="#s1"><span class="num">01</span><span><span class="tt">Primeros pasos</span><span class="dd">Ingreso, contraseña, pantalla y celular</span></span></a>
+    <a href="#s2"><span class="num">02</span><span><span class="tt">Inicio</span><span class="dd">Tu resumen diario y próximas acciones</span></span></a>
+    <a href="#s3"><span class="num">03</span><span><span class="tt">Prospectos</span><span class="dd">Registro, ficha, interacciones e historial</span></span></a>
+    <a href="#s4"><span class="num">04</span><span><span class="tt">Pipeline de ventas</span><span class="dd">Oportunidades y etapas del negocio</span></span></a>
+    <a href="#s5"><span class="num">05</span><span><span class="tt">Tareas y recordatorios</span><span class="dd">Tu agenda comercial</span></span></a>
+    <a href="#s6"><span class="num">06</span><span><span class="tt">Cotizaciones</span><span class="dd">Propuestas, estados y conversión a cliente</span></span></a>
+    <a href="#s7"><span class="num">07</span><span><span class="tt">Informe semanal</span><span class="dd">Indicadores y descarga del Excel</span></span></a>
+    <a href="#s8"><span class="num">08</span><span><span class="tt">Alertas</span><span class="dd">Seguimientos pendientes y oportunidades</span></span></a>
+    <a href="#s9"><span class="num">09</span><span><span class="tt">Productos</span><span class="dd">Catálogo y precios vigentes</span></span></a>
+    <a href="#s10"><span class="num">10</span><span><span class="tt">Dashboard gerencial</span><span class="dd">Ventas, conversión y rendimiento</span></span></a>
+    <a href="#s11"><span class="num">11</span><span><span class="tt">Administración</span><span class="dd">Usuarios, roles, catálogos, configuración y auditoría</span></span></a>
+    <a href="#s12"><span class="num">12</span><span><span class="tt">Buenas prácticas y FAQ</span><span class="dd">Rutinas, preguntas frecuentes y glosario</span></span></a>
+  </div>
+
+  <div class="callout info" style="margin-top:8mm">
+    <span class="tag">Dato</span>
+    El CRM reemplaza el control en Excel. Toda la información se registra directamente en el sistema y el <strong>Informe semanal</strong> permite descargar el formato <strong>FOR-VEN-001</strong> cuando se necesite.
+  </div>
+</section>
+
+<!-- ================= 01 PRIMEROS PASOS ================= -->
+<section class="sheet" id="s1">
+  <div class="section-head">
+    <div class="kicker">01 · Primeros pasos</div>
+    <h1>Empieza en pocos minutos</h1>
+    <p class="lead">Aprende a ingresar, proteger tu cuenta y ubicar las funciones principales.</p>
+  </div>
+
+  <h2><span class="n">1.1</span> Ingresar al sistema</h2>
+  <ol class="steps">
+    <li>Abre en el navegador la dirección del CRM que te entregue el área de Sistemas.</li>
+    <li>Escribe tu <strong>correo corporativo</strong> y tu <strong>contraseña</strong>.</li>
+    <li>Pulsa <strong>Ingresar</strong>. Si es tu primer acceso, el sistema te pedirá crear una contraseña definitiva (mínimo 8 caracteres, con letras y números).</li>
+  </ol>
+  <figure>
+    <img src="capturas/01-login.png" alt="Pantalla de inicio de sesión">
+    <figcaption><b>Figura 1.</b> Pantalla de inicio de sesión. Usa siempre tu cuenta personal; no compartas la contraseña.</figcaption>
+  </figure>
+  <div class="callout warn">
+    <span class="tag">Importante</span>
+    Si olvidaste tu contraseña, solicita al administrador del CRM que la restablezca. Por seguridad, el sistema te obligará a cambiarla en el siguiente ingreso.
+  </div>
+
+  <h2><span class="n">1.2</span> Cambiar la contraseña y cerrar sesión</h2>
+  <p>Haz clic en tu <strong>avatar</strong> (esquina superior derecha) para abrir el menú de usuario:</p>
+  <ul>
+    <li><strong>Cambiar contraseña:</strong> actualiza tu clave cuando lo necesites.</li>
+    <li><strong>Cerrar sesión:</strong> sal del sistema, especialmente en equipos compartidos.</li>
+  </ul>
+
+  <h2><span class="n">1.3</span> Conocer la pantalla</h2>
+  <p>La navegación principal está en la barra lateral izquierda. Los módulos que ves dependen de tu rol y permisos:</p>
+  <div class="callout tip">
+    <span class="tag">Consejo</span>
+    Puedes <strong>contraer el menú</strong> con el botón inferior de la barra lateral para ganar espacio de trabajo. El menú se expande de nuevo con el mismo botón.
+  </div>
+  <table class="tbl">
+    <tr><th>Sección</th><th>Qué encuentras</th></tr>
+    <tr><td>Inicio</td><td>Resumen diario: tareas, seguimientos y prospectos que requieren atención.</td></tr>
+    <tr><td>Prospectos</td><td>Listado y ficha completa de personas naturales y jurídicas.</td></tr>
+    <tr><td>Tareas</td><td>Agenda de actividades: hoy, próximas, vencidas y completadas.</td></tr>
+    <tr><td>Pipeline</td><td>Tablero visual de oportunidades por etapa de venta.</td></tr>
+    <tr><td>Cotizaciones</td><td>Propuestas comerciales y su estado.</td></tr>
+    <tr><td>Informe semanal</td><td>Indicadores de ventas y descarga del Excel FOR-VEN-001.</td></tr>
+    <tr><td>Alertas</td><td>Avisos automáticos de seguimiento y oportunidades.</td></tr>
+    <tr><td>Dashboard gerencial</td><td>Métricas del equipo y del negocio (según permisos).</td></tr>
+    <tr><td>Catálogo → Productos</td><td>Productos y servicios con precios vigentes.</td></tr>
+    <tr><td>Administración</td><td>Usuarios, roles, catálogos, configuración y auditoría.</td></tr>
+  </table>
+
+  <h2><span class="n">1.4</span> Usar el CRM en el celular</h2>
+  <p>El sistema se adapta al celular. En la parte inferior tienes accesos directos a <strong>Inicio</strong>, <strong>Prospectos</strong> y <strong>Productos</strong>; el botón <strong>Más</strong> abre el menú completo. La información es la misma que ves en la computadora.</p>
+  <figure class="figure-phone">
+    <img src="capturas/23-movil.png" alt="Vista del CRM en celular">
+    <figcaption><b>Figura 2.</b> Navegación móvil: accesos rápidos en la barra inferior y menú completo en “Más”.</figcaption>
+  </figure>
+</section>
+
+<!-- ================= 02 INICIO ================= -->
+<section class="sheet" id="s2">
+  <div class="section-head">
+    <div class="kicker">02 · Inicio</div>
+    <h1>Tu resumen del día</h1>
+    <p class="lead">Al ingresar verás lo que necesita tu atención hoy: tareas, seguimientos y prospectos en riesgo.</p>
+  </div>
+
+  <p>La pantalla de Inicio se divide en tres bloques: <strong>indicadores</strong>, <strong>próximas acciones</strong> y <strong>accesos rápidos</strong>. Los indicadores son clicables y llevan al listado de prospectos.</p>
+
+  <table class="tbl">
+    <tr><th>Indicador</th><th>Qué significa</th></tr>
+    <tr><td>Tareas hoy</td><td>Actividades programadas para la fecha actual.</td></tr>
+    <tr><td>Tareas vencidas</td><td>Actividades pendientes cuya fecha ya pasó. Atiéndelas primero.</td></tr>
+    <tr><td>Nuevos esta semana</td><td>Prospectos registrados en los últimos siete días.</td></tr>
+    <tr><td>Seguimientos hoy</td><td>Contactos o acciones de seguimiento programadas para hoy.</td></tr>
+    <tr><td>Sin contacto &gt; 7 días</td><td>Prospectos activos que llevan más de una semana sin interacción registrada.</td></tr>
+    <tr><td>Alto interés</td><td>Prospectos marcados con nivel de interés alto.</td></tr>
+  </table>
+
+  <figure>
+    <img src="capturas/02-inicio.png" alt="Pantalla de inicio con indicadores">
+    <figcaption><b>Figura 3.</b> Inicio: indicadores del día, próximas acciones y accesos rápidos.</figcaption>
+  </figure>
+
+  <div class="callout tip">
+    <span class="tag">Consejo</span>
+    Convierte la revisión de Inicio en tu primera acción del día: revisa <strong>Tareas vencidas</strong> y <strong>Sin contacto &gt; 7 días</strong>, y programa un seguimiento para cada caso.
+  </div>
+  <div class="callout info">
+    <span class="tag">Dato</span>
+    La sección <strong>Próximas acciones</strong> muestra tareas y recordatorios programados con un botón <strong>Ver ficha</strong> para abrir directamente al prospecto.
+  </div>
+</section>
+
+<!-- ================= 03 PROSPECTOS ================= -->
+<section class="sheet" id="s3">
+  <div class="section-head">
+    <div class="kicker">03 · Prospectos</div>
+    <h1>El corazón del CRM</h1>
+    <p class="lead">Aquí vive cada persona natural o jurídica con su estado, responsable y próxima acción.</p>
+  </div>
+
+  <h2><span class="n">3.1</span> Buscar y filtrar el listado</h2>
+  <p>El buscador encuentra por <strong>nombre, correo, teléfono, documento o código</strong>. Los filtros superiores separan por estado: <span class="badge brand">Activos</span> <span class="badge">En pausa</span> <span class="badge">Descartados</span> <span class="badge">No califica</span> <span class="badge">Inactivos</span>.</p>
+  <ul>
+    <li>Haz clic en una fila para abrir la <strong>ficha del prospecto</strong>.</li>
+    <li>Marca las casillas de varias filas para <strong>asignarlas en bloque</strong> a otro responsable.</li>
+    <li>Usa <strong>Anterior / Siguiente</strong> para moverte entre páginas.</li>
+  </ul>
+  <figure>
+    <img src="capturas/03-prospectos.png" alt="Listado de prospectos">
+    <figcaption><b>Figura 4.</b> Listado de prospectos: búsqueda, filtros por estado, responsable y acciones por fila.</figcaption>
+  </figure>
+
+  <h2><span class="n">3.2</span> Registrar un prospecto nuevo</h2>
+  <ol class="steps">
+    <li>Pulsa <strong>Nuevo prospecto</strong>.</li>
+    <li>Elige el tipo de persona: <strong>Natural</strong> o <strong>Jurídica</strong>.</li>
+    <li>Completa los datos de identificación y contacto. Solo los campos con <strong>*</strong> son obligatorios.</li>
+    <li>Si lo deseas, agrega <strong>contactos adicionales</strong> (por ejemplo, el área de compras o el jefe directo).</li>
+    <li>Revisa la alerta de posible duplicado si aparece y pulsa <strong>Crear prospecto</strong>.</li>
+  </ol>
+  <figure>
+    <img src="capturas/08-nuevo-prospecto.png" alt="Formulario de nuevo prospecto">
+    <figcaption><b>Figura 5.</b> Formulario de registro. El sistema advierte si detecta un nombre o documento parecido.</figcaption>
+  </figure>
+
+  <h3>Campos que conviene completar siempre</h3>
+  <table class="tbl">
+    <tr><th>Campo</th><th>Para qué sirve</th></tr>
+    <tr><td>Documento (DNI/RUC)</td><td>Identifica de forma única y evita duplicados.</td></tr>
+    <tr><td>Correo y teléfono</td><td>Permiten el contacto y la búsqueda rápida.</td></tr>
+    <tr><td>Origen y canal</td><td>Explican de dónde llegó el prospecto (web, referido, campaña, etc.).</td></tr>
+    <tr><td>Nivel de interés y prioridad</td><td>Ayudan a ordenar el trabajo y alimentan las alertas.</td></tr>
+    <tr><td>Responsable</td><td>Define quién da seguimiento al prospecto.</td></tr>
+    <tr><td>Notas</td><td>Contexto útil para cualquier persona del equipo.</td></tr>
+  </table>
+  <div class="callout warn">
+    <span class="tag">Importante</span>
+    Antes de crear un prospecto, búscalo por documento o nombre. Registrar duplicados fragmenta el historial y complica los reportes.
+  </div>
+
+  <h2 class="page-break"><span class="n">3.3</span> La ficha del prospecto</h2>
+  <p>La ficha reúne todo el historial comercial en pestañas. La cabecera muestra el nombre, código, tipo de persona, si es <strong>Prospecto</strong> o <strong>Cliente</strong>, y su estado.</p>
+  <figure>
+    <img src="capturas/04-prospecto-detalle.png" alt="Ficha del prospecto, pestaña Resumen">
+    <figcaption><b>Figura 6.</b> Ficha del prospecto. El menú <strong>⋯</strong> permite editar, asignar, cambiar estado o eliminar.</figcaption>
+  </figure>
+  <table class="tbl">
+    <tr><th>Pestaña</th><th>Qué contiene</th></tr>
+    <tr><td>Resumen</td><td>Datos de contacto, notas y resumen comercial (responsable, interés, prioridad, origen).</td></tr>
+    <tr><td>Contactos</td><td>Personas de la empresa; la marcada como <strong>Principal</strong> es el contacto habitual.</td></tr>
+    <tr><td>Interacciones</td><td>Historial de llamadas, correos, reuniones y mensajes.</td></tr>
+    <tr><td>Tareas</td><td>Actividades y recordatorios del prospecto.</td></tr>
+    <tr><td>Oportunidades</td><td>Negociaciones abiertas y su etapa en el pipeline.</td></tr>
+    <tr><td>Cotizaciones</td><td>Propuestas enviadas, aceptadas o rechazadas.</td></tr>
+    <tr><td>Historial</td><td>Cambios de responsable y de estado, con fecha y motivo.</td></tr>
+  </table>
+
+  <h2><span class="n">3.4</span> Registrar una interacción</h2>
+  <p>Cada contacto con el prospecto debe quedar registrado. Entra a la pestaña <strong>Interacciones</strong> y pulsa <strong>Registrar</strong>.</p>
+  <ol class="steps">
+    <li>Indica el <strong>canal</strong> (llamada, correo, WhatsApp, reunión, etc.) y la <strong>modalidad</strong>.</li>
+    <li>Selecciona el <strong>resultado</strong> del contacto y el <strong>nivel de interés</strong> observado.</li>
+    <li>Escribe una nota breve con lo conversado y el siguiente paso acordado.</li>
+    <li>Guarda. El sistema numera el intento automáticamente.</li>
+  </ol>
+  <figure>
+    <img src="capturas/05-prospecto-interacciones.png" alt="Interacciones del prospecto">
+    <figcaption><b>Figura 7.</b> Pestaña Interacciones: cada registro conserva canal, resultado, interés, autor y fecha.</figcaption>
+  </figure>
+  <div class="callout tip">
+    <span class="tag">Consejo</span>
+    Registra la interacción el mismo día. Una nota concreta (“pidió propuesta de 10 licencias para el 15”) vale más que diez llamadas sin contexto.
+  </div>
+
+  <h2><span class="n">3.5</span> Asignar, cambiar de estado y eliminar</h2>
+  <p>Desde el menú <strong>⋯</strong> de la fila o de la ficha:</p>
+  <ul>
+    <li><strong>Editar:</strong> actualiza los datos del prospecto.</li>
+    <li><strong>Asignar:</strong> transfiere el prospecto a otro responsable. Puedes dejar un motivo para que quede en el historial.</li>
+    <li><strong>Cambiar estado:</strong> pasa a <em>Activo, En pausa, Descartado, No califica o Inactivo</em>. El sistema pide un motivo.</li>
+    <li><strong>Eliminar:</strong> retira el prospecto del listado. La eliminación es <strong>lógica</strong>: el registro se conserva para auditoría, pero deja de mostrarse.</li>
+  </ul>
+  <div class="callout warn">
+    <span class="tag">Importante</span>
+    Cambiar el estado no borra el historial. Si un prospecto se retoma, vuelve a <strong>Activo</strong> y continúa donde quedó. Si necesitas recuperar un registro eliminado, solicita apoyo al administrador.
+  </div>
+</section>
+
+<!-- ================= 04 PIPELINE ================= -->
+<section class="sheet" id="s4">
+  <div class="section-head">
+    <div class="kicker">04 · Pipeline de ventas</div>
+    <h1>Visualiza tus oportunidades</h1>
+    <p class="lead">Cada oportunidad avanza por etapas. Arrastra la tarjeta para reflejar en qué punto está la negociación.</p>
+  </div>
+
+  <p>El tablero muestra una columna por etapa. En la cabecera de cada columna ves la cantidad de oportunidades y, al pie, el <strong>monto estimado total</strong>.</p>
+  <table class="tbl">
+    <tr><th>Etapa</th><th>Cuándo usarla</th></tr>
+    <tr><td>Nuevo</td><td>Oportunidad identificada, aún sin contacto formal.</td></tr>
+    <tr><td>Cotización</td><td>Se está preparando o enviando la propuesta.</td></tr>
+    <tr><td>Negociación</td><td>El cliente revisa condiciones, precios o alcance.</td></tr>
+    <tr><td>Cerrado ganado</td><td>La venta se concretó.</td></tr>
+    <tr><td>Cerrado perdido</td><td>La oportunidad se perdió; registra el motivo.</td></tr>
+  </table>
+
+  <figure>
+    <img src="capturas/09-pipeline.png" alt="Tablero del pipeline de ventas">
+    <figcaption><b>Figura 8.</b> Pipeline: arrastra una tarjeta entre columnas para actualizar la etapa de la oportunidad.</figcaption>
+  </figure>
+
+  <div class="callout tip">
+    <span class="tag">Consejo</span>
+    Mueve una tarjeta solo cuando la etapa refleje la realidad. Si una oportunidad se estanca, registra una tarea de seguimiento en lugar de moverla sin avance.
+  </div>
+
+  <h2 class="page-break"><span class="n">4.1</span> Crear una oportunidad</h2>
+  <ol class="steps">
+    <li>Abre la ficha del prospecto y entra a la pestaña <strong>Oportunidades</strong>.</li>
+    <li>Pulsa <strong>Nueva oportunidad</strong>.</li>
+    <li>Escribe un <strong>título</strong> claro (por ejemplo, “Renovación anual de licencias 2027”).</li>
+    <li>Selecciona la <strong>etapa</strong>, el <strong>tipo</strong> y, si aplica, el <strong>responsable</strong>.</li>
+    <li>Completa el <strong>monto estimado</strong>, la <strong>probabilidad</strong> y la <strong>fecha de cierre esperada</strong>.</li>
+    <li>Guarda. La oportunidad aparecerá en el pipeline y en la ficha del prospecto.</li>
+  </ol>
+  <figure>
+    <img src="capturas/10-nueva-oportunidad.png" alt="Formulario de nueva oportunidad">
+    <figcaption><b>Figura 9.</b> Nueva oportunidad desde la ficha del prospecto. Así queda siempre vinculada a un cliente.</figcaption>
+  </figure>
+  <div class="callout tip">
+    <span class="tag">Consejo</span>
+    Crea la oportunidad <strong>desde la ficha del prospecto</strong> para que quede correctamente vinculada. En el pipeline puedes moverla de etapa, editarla o eliminarla.
+  </div>
+  <div class="callout info">
+    <span class="tag">Dato</span>
+    La <strong>probabilidad</strong> es una estimación comercial, no un cálculo automático. Ayuda a priorizar y a leer el pipeline con realismo.
+  </div>
+</section>
+
+<!-- ================= 05 TAREAS ================= -->
+<section class="sheet" id="s5">
+  <div class="section-head">
+    <div class="kicker">05 · Tareas y recordatorios</div>
+    <h1>Que ningún seguimiento se pierda</h1>
+    <p class="lead">Organiza tu día y da seguimiento a cada prospecto con actividades concretas y fechadas.</p>
+  </div>
+
+  <p>La pantalla de Tareas agrupa las actividades en cuatro pestañas: <strong>Hoy</strong>, <strong>Próximas</strong>, <strong>Vencidas</strong> y <strong>Completadas</strong>.</p>
+  <ul>
+    <li>Marca el círculo a la izquierda para <strong>completar</strong> una tarea; vuelve a pulsarlo para reabrirla.</li>
+    <li>Usa <strong>Editar</strong> para cambiar fecha, responsable o prioridad.</li>
+    <li>Usa el ícono de papelera para eliminar una tarea.</li>
+  </ul>
+  <figure>
+    <img src="capturas/11-tareas.png" alt="Pantalla de tareas">
+    <figcaption><b>Figura 10.</b> Tareas: pestañas por vencimiento, enlace al prospecto y acciones para editar o eliminar.</figcaption>
+  </figure>
+
+  <h2><span class="n">5.1</span> Crear una tarea</h2>
+  <p>La forma más ordenada es crearla desde la ficha del prospecto, pestaña <strong>Tareas</strong>. También puedes crear tareas desde el listado general.</p>
+  <table class="tbl">
+    <tr><th>Campo</th><th>Recomendación</th></tr>
+    <tr><td>Título</td><td>Empieza con un verbo: “Llamar para confirmar propuesta”.</td></tr>
+    <tr><td>Descripción</td><td>Agrega el contexto necesario para retomarla sin releer todo.</td></tr>
+    <tr><td>Responsable</td><td>Asigna a quien realmente hará la tarea.</td></tr>
+    <tr><td>Tipo y prioridad</td><td>Ayudan a filtrar y a ordenar el trabajo.</td></tr>
+    <tr><td>Fecha de vencimiento</td><td>Sin fecha, la tarea no aparece en “Hoy” ni en “Vencidas”.</td></tr>
+    <tr><td>Recordatorio</td><td>Define cuándo quieres que el sistema te avise.</td></tr>
+  </table>
+  <div class="callout tip">
+    <span class="tag">Consejo</span>
+    Toda interacción debería terminar con una <strong>próxima acción con fecha</strong>.
+  </div>
+</section>
+
+<!-- ================= 06 COTIZACIONES ================= -->
+<section class="sheet" id="s6">
+  <div class="section-head">
+    <div class="kicker">06 · Cotizaciones</div>
+    <h1>De la propuesta a la venta</h1>
+    <p class="lead">Crea propuestas con productos del catálogo y controla su estado hasta el cierre.</p>
+  </div>
+
+  <p>Las cotizaciones se organizan por estado:</p>
+  <table class="tbl">
+    <tr><th>Estado</th><th>Significado</th></tr>
+    <tr><td>Borrador</td><td>Propuesta en preparación; todavía no se envió.</td></tr>
+    <tr><td>Enviada</td><td>Ya se compartió con el cliente y se espera respuesta.</td></tr>
+    <tr><td>Aceptada</td><td>El cliente aprobó la propuesta. <strong>El prospecto pasa a Cliente</strong> automáticamente.</td></tr>
+    <tr><td>Rechazada</td><td>El cliente no aceptó. Registra el motivo para aprender y dar seguimiento.</td></tr>
+  </table>
+
+  <figure>
+    <img src="capturas/12-cotizaciones.png" alt="Listado de cotizaciones">
+    <figcaption><b>Figura 11.</b> Cotizaciones: filtros por estado y acciones para enviar, aceptar, rechazar, editar o eliminar.</figcaption>
+  </figure>
+
+  <h2 class="page-break"><span class="n">6.1</span> Crear una cotización</h2>
+  <ol class="steps">
+    <li>Abre la ficha del prospecto y entra a la pestaña <strong>Cotizaciones</strong>.</li>
+    <li>Pulsa <strong>Nueva cotización</strong>.</li>
+    <li>Revisa la <strong>fecha de emisión</strong> y, si aplica, la fecha de validez.</li>
+    <li>Agrega los <strong>ítems</strong>: producto, descripción, cantidad y precio unitario.</li>
+    <li>Agrega notas para el cliente y guarda.</li>
+    <li>Desde el listado, usa <strong>Enviar</strong> cuando la propuesta salga y <strong>Aceptar</strong> o <strong>Rechazar</strong> cuando el cliente responda.</li>
+  </ol>
+  <figure>
+    <img src="capturas/13-nueva-cotizacion.png" alt="Formulario de nueva cotización">
+    <figcaption><b>Figura 12.</b> Nueva cotización: fechas, notas e ítems tomados del catálogo de productos.</figcaption>
+  </figure>
+  <div class="callout warn">
+    <span class="tag">Importante</span>
+    Al marcar una cotización como <strong>Aceptada</strong>, el prospecto se convierte en <strong>Cliente</strong> y deja de aparecer como prospecto en los filtros habituales. Es el paso que formaliza la venta en el CRM.
+  </div>
+  <div class="callout tip">
+    <span class="tag">Consejo</span>
+    Mantén los estados al día. Un tablero con cotizaciones “Enviadas” de hace meses deja de ser útil para tomar decisiones.
+  </div>
+</section>
+
+<!-- ================= 07 INFORME SEMANAL ================= -->
+<section class="sheet" id="s7">
+  <div class="section-head">
+    <div class="kicker">07 · Informe semanal</div>
+    <h1>Los números, sin armar Excel</h1>
+    <p class="lead">Consulta los indicadores del día y del mes, y descarga el formato oficial cuando lo necesites.</p>
+  </div>
+
+  <p>Selecciona una fecha y el sistema calcula los indicadores para ese día y su acumulado mensual:</p>
+  <ul>
+    <li><strong>Cotizaciones:</strong> cantidad emitida hoy y en el mes.</li>
+    <li><strong>Ventas totales:</strong> monto vendido hoy y en el mes.</li>
+    <li><strong>Ventas de actualización</strong> y <strong>ventas nuevas:</strong> separadas para analizar el tipo de ingreso.</li>
+    <li><strong>Nuevos clientes:</strong> prospectos convertidos en clientes.</li>
+  </ul>
+
+  <figure>
+    <img src="capturas/14-informe-semanal.png" alt="Informe semanal">
+    <figcaption><b>Figura 13.</b> Informe semanal con indicadores del día, acumulado del mes y descarga en Excel.</figcaption>
+  </figure>
+
+  <div class="callout ok">
+    <span class="tag">Descarga</span>
+    Pulsa <strong>Descargar Excel</strong> para obtener el archivo con el formato <strong>FOR-VEN-001</strong>. Úsalo para reportes internos o reuniones de gerencia.
+  </div>
+  <div class="callout info">
+    <span class="tag">Dato</span>
+    El informe se alimenta de lo registrado en el CRM: cotizaciones, ventas y conversiones. Si un dato no aparece, revisa que la cotización o venta esté correctamente registrada y con la fecha correspondiente.
+  </div>
+</section>
+
+<!-- ================= 08 ALERTAS ================= -->
+<section class="sheet" id="s8">
+  <div class="section-head">
+    <div class="kicker">08 · Alertas</div>
+    <h1>El sistema te avisa qué atender</h1>
+    <p class="lead">Alertas automáticas para que ningún prospecto quede olvidado ni ninguna cotización venza sin respuesta.</p>
+  </div>
+
+  <p>Las alertas se agrupan por <strong>estado</strong> (sin leer, leídas, descartadas) y por <strong>severidad</strong> (crítica, alta, media, baja). Los tipos más comunes son:</p>
+  <table class="tbl">
+    <tr><th>Tipo de alerta</th><th>Cuándo aparece</th></tr>
+    <tr><td>Sin primer contacto</td><td>El prospecto se registró pero aún no tiene interacciones.</td></tr>
+    <tr><td>Sin seguimiento</td><td>Pasaron varios días desde el último contacto registrado.</td></tr>
+    <tr><td>Cotización por vencer</td><td>La propuesta está cerca de su fecha de vencimiento.</td></tr>
+    <tr><td>Cotización sin respuesta</td><td>Se envió y el cliente no respondió en el plazo esperado.</td></tr>
+    <tr><td>Prospecto estancado</td><td>No avanza de etapa en el pipeline.</td></tr>
+    <tr><td>Oportunidad de alto valor</td><td>El monto estimado supera el umbral configurado.</td></tr>
+  </table>
+
+  <figure>
+    <img src="capturas/15-alertas.png" alt="Pantalla de alertas">
+    <figcaption><b>Figura 14.</b> Alertas: filtros por estado y severidad, marca como leída y descarta las que ya atendiste.</figcaption>
+  </figure>
+
+  <div class="callout tip">
+    <span class="tag">Consejo</span>
+    Revisa tus alertas <strong>sin leer</strong> al empezar el día. Marca como leída solo cuando hayas actuado; descarta únicamente las que no aplican.
+  </div>
+  <div class="callout info">
+    <span class="tag">Dato</span>
+    Si tienes permisos, el botón <strong>Generar ahora</strong> recalcula las alertas con la información más reciente. El sistema también las genera de forma automática.
+  </div>
+</section>
+
+<!-- ================= 09 PRODUCTOS ================= -->
+<section class="sheet" id="s9">
+  <div class="section-head">
+    <div class="kicker">09 · Productos</div>
+    <h1>El catálogo a mano</h1>
+    <p class="lead">Consulta productos, servicios y precios vigentes antes de cotizar.</p>
+  </div>
+
+  <p>El catálogo se filtra por <strong>categoría</strong> con los botones superiores y por <strong>nombre o código</strong> con el buscador. Cada producto muestra su código, tipo, periodicidad de cobro y precio final.</p>
+
+  <figure>
+    <img src="capturas/16-productos.png" alt="Catálogo de productos">
+    <figcaption><b>Figura 15.</b> Catálogo de productos: categorías, búsqueda y precio vigente. Los precios son finales.</figcaption>
+  </figure>
+
+  <table class="tbl">
+    <tr><th>Concepto</th><th>Valores posibles</th></tr>
+    <tr><td>Tipo</td><td>Licencia perpetua, suscripción, usuario adicional, demo.</td></tr>
+    <tr><td>Periodicidad</td><td>Único, semanal, mensual o anual (cuando aplica).</td></tr>
+    <tr><td>Precio</td><td>Precio final en soles. Un producto gratuito se muestra como <strong>Gratis</strong>.</td></tr>
+  </table>
+
+  <div class="callout info">
+    <span class="tag">Dato</span>
+    Solo los usuarios con permiso de <strong>gestión de productos</strong> pueden crear o editar ítems del catálogo. Si necesitas un cambio de precio, solicítalo al administrador.
+  </div>
+  <div class="callout tip">
+    <span class="tag">Consejo</span>
+    Al cotizar, elige el producto desde el catálogo en lugar de escribir el precio a mano. Así mantienes coherencia entre propuestas e informes.
+  </div>
+</section>
+
+<!-- ================= 10 DASHBOARD GERENCIAL ================= -->
+<section class="sheet" id="s10">
+  <div class="section-head">
+    <div class="kicker">10 · Dashboard gerencial</div>
+    <h1>Visión del negocio y del equipo</h1>
+    <p class="lead">Indicadores consolidados para gerencia: ventas, conversión, pipeline y rendimiento.</p>
+  </div>
+
+  <p>Este tablero está pensado para reuniones de gestión. Muestra:</p>
+  <table class="tbl">
+    <tr><th>Bloque</th><th>Qué responde</th></tr>
+    <tr><td>Ventas este mes</td><td>Monto vendido y comparación con el mes anterior.</td></tr>
+    <tr><td>Nuevos clientes</td><td>Clientes ganados en el mes frente al mes previo.</td></tr>
+    <tr><td>Tasa de conversión</td><td>Prospectos convertidos en clientes sobre el total.</td></tr>
+    <tr><td>Pipeline total</td><td>Monto estimado y cantidad de oportunidades activas.</td></tr>
+    <tr><td>Pipeline por etapa</td><td>Distribución de oportunidades y montos por etapa.</td></tr>
+    <tr><td>Top vendedores</td><td>Ranking por ventas cerradas en el mes.</td></tr>
+    <tr><td>Top productos cotizados</td><td>Productos más cotizados por monto.</td></tr>
+  </table>
+
+  <figure>
+    <img src="capturas/17-dashboard-gerencial.png" alt="Dashboard gerencial">
+    <figcaption><b>Figura 16.</b> Dashboard gerencial: ventas, conversión, pipeline, mejores vendedores y productos.</figcaption>
+  </figure>
+
+  <div class="callout info">
+    <span class="tag">Dato</span>
+    El botón <strong>Actualizar</strong> recalcula las métricas con la información más reciente. La fecha y hora de generación aparece bajo el título.
+  </div>
+</section>
+
+<!-- ================= 11 ADMINISTRACIÓN ================= -->
+<section class="sheet" id="s11">
+  <div class="section-head">
+    <div class="kicker">11 · Administración</div>
+    <h1>Configura el CRM a tu medida</h1>
+    <p class="lead">Estas pantallas están disponibles según tu rol. Si no ves alguna, solicita los permisos al administrador.</p>
+  </div>
+
+  <h2><span class="n">11.1</span> Usuarios</h2>
+  <p>Crea las cuentas del equipo, asigna su rol y controla el acceso. Los usuarios <strong>no se eliminan</strong>: se <strong>desactivan</strong>, y su historial se conserva.</p>
+  <ul>
+    <li><strong>Nuevo usuario:</strong> nombre, correo corporativo y rol.</li>
+    <li><strong>Editar:</strong> actualiza datos o rol.</li>
+    <li><strong>Desactivar / Reactivar:</strong> bloquea o devuelve el acceso. Al desactivar se cierran sus sesiones activas.</li>
+    <li><strong>Estado:</strong> activo, inactivo o pendiente de ingreso (cuando aún no define su contraseña).</li>
+  </ul>
+  <figure>
+    <img src="capturas/18-usuarios.png" alt="Gestión de usuarios">
+    <figcaption><b>Figura 17.</b> Usuarios: rol, estado y último ingreso. El menú de cada fila permite editar o desactivar.</figcaption>
+  </figure>
+
+  <h2><span class="n">11.2</span> Roles y permisos</h2>
+  <p>Cada rol define qué módulos y acciones puede usar una persona. El sistema incluye tres roles base: <strong>Administrador</strong>, <strong>Gerente</strong> y <strong>Ventas</strong>.</p>
+  <ol class="steps">
+    <li>Selecciona un rol en la lista de la izquierda.</li>
+    <li>Marca o desmarca los permisos en la matriz de la derecha.</li>
+    <li>Pulsa <strong>Guardar</strong> en la barra que aparece. Los cambios se aplican cuando el usuario renueva su sesión.</li>
+  </ol>
+  <figure>
+    <img src="capturas/19-roles.png" alt="Roles y permisos">
+    <figcaption><b>Figura 18.</b> Roles y permisos: matriz por módulo. El rol Administrador siempre conserva todos los permisos.</figcaption>
+  </figure>
+  <div class="callout warn">
+    <span class="tag">Importante</span>
+    La interfaz solo oculta acciones; el servidor valida cada permiso. Un permiso mal asignado puede impedir que una persona vea o edite información que necesita.
+  </div>
+
+  <h2><span class="n">11.3</span> Catálogos</h2>
+  <p>Los catálogos alimentan los formularios y filtros: etapas del pipeline, formas de contacto, motivos de pérdida, niveles de interés, prioridades, tipos de tarea y más.</p>
+  <ul>
+    <li>Elige el catálogo en la lista de la izquierda.</li>
+    <li>Agrega una opción con <strong>Agregar opción</strong>, o edítala con el lápiz.</li>
+    <li>Ordena con las flechas; el orden se refleja en los formularios.</li>
+    <li>Las opciones con candado son del sistema y no se pueden borrar.</li>
+  </ul>
+  <figure>
+    <img src="capturas/20-catalogos.png" alt="Catálogos del sistema">
+    <figcaption><b>Figura 19.</b> Catálogos: opciones, orden y peso. Las etapas del pipeline incluyen un peso para el pronóstico.</figcaption>
+  </figure>
+
+  <h2><span class="n">11.4</span> Configuración</h2>
+  <p>Agrupa los parámetros generales y las reglas del CRM:</p>
+  <table class="tbl">
+    <tr><th>Grupo</th><th>Qué configura</th></tr>
+    <tr><td>General</td><td>Nombre de la empresa, moneda y zona horaria.</td></tr>
+    <tr><td>Prospectos</td><td>Unicidad del documento (DNI/RUC) y similitud mínima para advertir duplicados por nombre.</td></tr>
+    <tr><td>Alertas y seguimiento</td><td>Umbrales de días sin contacto, cotizaciones por vencer y oportunidades de alto valor.</td></tr>
+  </table>
+  <figure>
+    <img src="capturas/21-configuracion.png" alt="Configuración del CRM">
+    <figcaption><b>Figura 20.</b> Configuración: parámetros generales y reglas de prospectos y alertas.</figcaption>
+  </figure>
+
+  <h2><span class="n">11.5</span> Auditoría</h2>
+  <p>Registra las acciones importantes del sistema: quién hizo qué y cuándo. Es útil para investigar cambios, recuperar contexto y cumplir controles internos.</p>
+  <figure class="figure-short">
+    <img src="capturas/22-auditoria.png" alt="Auditoría del sistema">
+    <figcaption><b>Figura 21.</b> Auditoría: historial de cambios con usuario, acción, entidad y fecha.</figcaption>
+  </figure>
+</section>
+
+<!-- ================= 12 BUENAS PRÁCTICAS ================= -->
+<section class="sheet" id="s12">
+  <div class="section-head">
+    <div class="kicker">12 · Buenas prácticas y preguntas frecuentes</div>
+    <h1>Trabaja con orden</h1>
+    <p class="lead">Pequeños hábitos diarios mantienen el CRM confiable y útil para todo el equipo.</p>
+  </div>
+
+  <h2><span class="n">12.1</span> Rutina diaria recomendada</h2>
+  <ol class="steps">
+    <li>Revisa <strong>Inicio</strong>: tareas vencidas y prospectos sin contacto.</li>
+    <li>Atiende las <strong>alertas sin leer</strong> y marca como leídas las que ya gestionaste.</li>
+    <li>Registra cada interacción del día con su próxima acción y fecha.</li>
+    <li>Actualiza el <strong>pipeline</strong> cuando una oportunidad cambie de etapa.</li>
+    <li>Antes de cerrar el día, completa o reprograma las tareas pendientes.</li>
+  </ol>
+
+  <h2><span class="n">12.2</span> Rutina semanal</h2>
+  <ul>
+    <li>Revisa el <strong>Informe semanal</strong> y descarga el Excel si corresponde.</li>
+    <li>Depura prospectos <strong>en pausa</strong> o <strong>descartados</strong> con su motivo.</li>
+    <li>Actualiza cotizaciones enviadas: aceptadas, rechazadas o por vencer.</li>
+    <li>Verifica que las oportunidades tengan monto y fecha de cierre realistas.</li>
+  </ul>
+
+  <h2><span class="n">12.3</span> Preguntas frecuentes</h2>
+  <table class="tbl">
+    <tr><th>Pregunta</th><th>Respuesta</th></tr>
+    <tr><td>¿Puedo importar el Excel anterior?</td><td>No. El CRM está diseñado para reemplazar el Excel: la información se registra directamente en el sistema. El formato FOR-VEN-001 se descarga desde <strong>Informe semanal</strong>.</td></tr>
+    <tr><td>¿Olvidé mi contraseña, qué hago?</td><td>Solicita al administrador que la restablezca. En el siguiente ingreso deberás crear una nueva.</td></tr>
+    <tr><td>¿Por qué no veo un módulo?</td><td>Tu rol no tiene ese permiso. Pide al administrador que lo revise en <strong>Roles y permisos</strong>.</td></tr>
+    <tr><td>¿Puedo recuperar un prospecto eliminado?</td><td>La eliminación es lógica y el registro se conserva para auditoría. Solicita apoyo al administrador.</td></tr>
+    <tr><td>¿Cómo paso un prospecto a cliente?</td><td>Registra y marca una cotización como <strong>Aceptada</strong>. El sistema hace la conversión automáticamente.</td></tr>
+    <tr><td>¿Puedo usar el CRM desde el celular?</td><td>Sí. Ingresa con el navegador; la barra inferior te da acceso rápido a Inicio, Prospectos y Productos.</td></tr>
+    <tr><td>¿Dónde veo quién cambió un dato?</td><td>En <strong>Auditoría</strong>, si tienes permiso. También en la pestaña <strong>Historial</strong> de cada prospecto.</td></tr>
+    <tr><td>¿Qué hago si un dato está mal?</td><td>Corrígelo desde la ficha (Editar). Evita duplicar el registro para “empezar de nuevo”.</td></tr>
+  </table>
+
+  <h2><span class="n">12.4</span> Glosario breve</h2>
+  <table class="tbl">
+    <tr><th>Término</th><th>Definición</th></tr>
+    <tr><td>Prospecto</td><td>Persona natural o jurídica que aún no ha comprado. Puede estar activo, en pausa, descartado, etc.</td></tr>
+    <tr><td>Cliente</td><td>Prospecto que ya concretó una venta o aceptó una cotización.</td></tr>
+    <tr><td>Interacción</td><td>Cualquier contacto registrado: llamada, correo, WhatsApp, reunión.</td></tr>
+    <tr><td>Oportunidad</td><td>Negociación concreta con monto y etapa dentro del pipeline.</td></tr>
+    <tr><td>Pipeline</td><td>Tablero visual de oportunidades por etapa de venta.</td></tr>
+    <tr><td>Cotización</td><td>Propuesta comercial con ítems, precios y estado.</td></tr>
+    <tr><td>Alerta</td><td>Aviso automático sobre un seguimiento, cotización u oportunidad.</td></tr>
+    <tr><td>Auditoría</td><td>Registro histórico de acciones y cambios realizados en el sistema.</td></tr>
+  </table>
+
+  <div class="callout ok" style="margin-top:8mm">
+    <span class="tag">Cierre</span>
+    Este manual cubre el uso diario del CRM. Si encuentras una situación no descrita o necesitas un cambio de configuración, contacta al administrador del CRM o al área de Sistemas de DATA SERVICE.
+  </div>
+  <p class="small muted" style="margin-top:10mm;text-align:center">Manual de Usuario · CRM Comercial DATA SERVICE · Versión 1.0 · Noviembre 2026</p>
+</section>
+
+</body>
+</html>

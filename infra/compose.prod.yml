@@ -1,0 +1,99 @@
+name: crm-dataservice
+
+# Producción en VPS. Uso:
+#   docker compose -f infra/compose.prod.yml --env-file .env up -d --build
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      TZ: America/Lima
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    # Sin puertos publicados: la base de datos solo es accesible dentro de la red de Docker.
+
+  migrate:
+    build: { context: ../apps/api, dockerfile: ../../infra/docker/api.Dockerfile, target: prod }
+    env_file: ../.env
+    environment:
+      ENVIRONMENT: production
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    command: sh -c "alembic upgrade head && python -m app.seeds.base"
+    depends_on:
+      db: { condition: service_healthy }
+    restart: "no"
+
+  api:
+    build: { context: ../apps/api, dockerfile: ../../infra/docker/api.Dockerfile, target: prod }
+    restart: unless-stopped
+    env_file: ../.env
+    environment:
+      ENVIRONMENT: production
+      COOKIE_SECURE: "true"
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  worker:
+    build: { context: ../apps/api, dockerfile: ../../infra/docker/api.Dockerfile, target: prod }
+    restart: unless-stopped
+    env_file: ../.env
+    environment:
+      ENVIRONMENT: production
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    command: python -m app.workers.scheduler
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  web:
+    build: { context: ../apps/web, dockerfile: ../../infra/docker/web.Dockerfile }
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - letsencrypt:/etc/letsencrypt:ro
+      - certbot_www:/var/www/certbot:ro
+    depends_on: [api]
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - letsencrypt:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+    # Renueva cada 12 h si corresponde. El primer certificado se emite según el README (sección Producción).
+    entrypoint: sh -c "trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done"
+    restart: unless-stopped
+
+  backup:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      PGHOST: db
+      PGUSER: ${POSTGRES_USER}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB}
+      TZ: America/Lima
+    volumes:
+      - ../backups:/backups
+      - ./backup/backup.sh:/backup.sh:ro
+      - ./backup/restore.sh:/restore.sh:ro
+    # Respaldo diario a las 02:00 (hora Lima) con rotación 7 diarios / 4 semanales / 12 mensuales.
+    entrypoint: sh -c 'echo "0 2 * * * sh /backup.sh >> /backups/backup.log 2>&1" | crontab - && crond -f'
+    depends_on:
+      db: { condition: service_healthy }
+
+volumes:
+  pgdata:
+  letsencrypt:
+  certbot_www:
