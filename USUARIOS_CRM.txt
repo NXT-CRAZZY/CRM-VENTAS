@@ -1,0 +1,17 @@
+Estos son los usuarios disponibles para probar el CRM:
+
+Correo	Nombre	Rol							Contraseña
+
+admin@dataservice.pe	Administrador del sistema	Administrador	Admin123!
+gerencia@dataservice.pe	Ricardo Salazar Paredes	Gerente	Demo1234
+maria.quispe@dataservice.pe	María Quispe Huamán	Ventas		Demo1234
+lucia.fernandez@dataservice.pe	Lucía Fernández Rojas	Ventas		Demo1234
+carla.rojas@dataservice.pe	Carla Rojas Villanueva	Ventas		Demo1234
+
+
+
+Qué probar con cada uno:
+
+- Admin: crear usuarios, roles, catálogos, productos y prospectos.
+- Gerencia: ver todos los prospectos y asignar responsables.
+- Ventas: ver solo los prospectos asignados, crear y editar los suyos.

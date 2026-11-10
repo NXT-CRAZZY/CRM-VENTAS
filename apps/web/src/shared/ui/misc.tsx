@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader } from './dialog'
 
 export function Logo({ variant = 'full', onDark, className }: { variant?: 'full' | 'mark'; onDark?: boolean; className?: string }) {
   const src = variant === 'full' ? (onDark ? logoLight : logo) : onDark ? isotipoLight : isotipo
-  return <img src={src} alt="DSCONT Software" className={cn('select-none', className)} draggable={false} />
+  return <img src={src} alt="DSCONT Ventas" className={cn('select-none', className)} draggable={false} />
 }
 
 export function KpiCard({
