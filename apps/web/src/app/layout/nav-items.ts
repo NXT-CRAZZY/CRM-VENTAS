@@ -41,7 +41,7 @@ export const NAV: NavSection[] = [
       { label: 'Tareas', to: '/tareas', icon: ListChecks, permission: P.TASKS_MANAGE },
       { label: 'Pipeline', to: '/pipeline', icon: KanbanSquare, permission: P.OPPORTUNITIES_MANAGE },
       { label: 'Cotizaciones', to: '/cotizaciones', icon: FileText, permission: P.QUOTES_MANAGE },
-      { label: 'Informe semanal', to: '/informe-semanal', icon: BarChart3, permission: P.IMPORT_RUN },
+      { label: 'Informe de ventas', to: '/informe-semanal', icon: BarChart3, permission: P.IMPORT_RUN },
       { label: 'Alertas', to: '/alertas', icon: Bell },
       { label: 'Dashboard gerencial', to: '/dashboard/gerencial', icon: TrendingUp, permission: P.DASHBOARD_MANAGEMENT },
     ],

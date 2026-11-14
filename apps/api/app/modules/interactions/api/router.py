@@ -8,14 +8,23 @@ from app.modules.audit.application.recorder import Audit
 from app.modules.interactions.application.use_cases import InteractionService
 from app.modules.interactions.repository import SqlInteractionRepository
 from app.modules.interactions.schemas import InteractionCreate, InteractionRead, InteractionUpdate
+from app.modules.opportunities.application.use_cases import OpportunityService
+from app.modules.opportunities.repository import SqlOpportunityRepository
 from app.modules.rbac.domain.permissions import P
+from app.modules.tasks.application.use_cases import TaskService
+from app.modules.tasks.repository import SqlTaskRepository
 from app.shared.pagination import Page, PageParams
 
 router = APIRouter(tags=["Interacciones"])
 
 
 def _service(db: DbSession, audit: Audit) -> InteractionService:
-    return InteractionService(SqlInteractionRepository(db), audit)
+    return InteractionService(
+        SqlInteractionRepository(db),
+        audit,
+        TaskService(SqlTaskRepository(db), audit),
+        OpportunityService(SqlOpportunityRepository(db), audit),
+    )
 
 
 Service = Annotated[InteractionService, Depends(_service)]

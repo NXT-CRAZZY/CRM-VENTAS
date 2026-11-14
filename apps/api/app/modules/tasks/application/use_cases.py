@@ -62,12 +62,13 @@ class TaskService:
             page_size=params.page_size,
         )
 
-    def create_task(self, data: TaskCreate, actor: User) -> Task:
+    def create_task(self, data: TaskCreate, actor: User, interaction_id: int | None = None) -> Task:
         prospect_id = self._prospect(data.prospect_id)
         resolved = self._resolve_ids(data)
 
         task = Task(
             prospect_id=prospect_id,
+            interaction_id=interaction_id,
             assignee_id=resolved.get("assignee_id"),
             type_id=resolved.get("type_id"),
             priority_id=resolved.get("priority_id"),
@@ -90,11 +91,14 @@ class TaskService:
 
         return task
 
-    def update_task(self, public_id: UUID, data: TaskUpdate, actor: User) -> Task:
+    def update_task(
+        self, public_id: UUID, data: TaskUpdate, actor: User, check_scope: bool = True
+    ) -> Task:
         task = self.repo.get_task(public_id)
         if task is None:
             raise NotFoundError("La tarea no existe.")
-        self._enforce_scope(task, actor)
+        if check_scope:
+            self._enforce_scope(task, actor)
 
         resolved = self._resolve_ids(data)
 
@@ -145,11 +149,12 @@ class TaskService:
 
         return task
 
-    def delete_task(self, public_id: UUID, actor: User) -> None:
+    def delete_task(self, public_id: UUID, actor: User, check_scope: bool = True) -> None:
         task = self.repo.get_task(public_id)
         if task is None:
             raise NotFoundError("La tarea no existe.")
-        self._enforce_scope(task, actor)
+        if check_scope:
+            self._enforce_scope(task, actor)
         self.repo.delete(task)
 
         if self.audit:

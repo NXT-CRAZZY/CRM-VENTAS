@@ -19,8 +19,12 @@ export interface ProspectFilters {
   relationship_type?: 'PROSPECTO' | 'CLIENTE'
   owner_id?: string
   interest_level_id?: string
+  interest_level_code?: string
   priority_id?: string
   source_id?: string
+  without_contact_days?: number
+  next_action_today?: boolean
+  created_since_days?: number
   page: number
 }
 
@@ -43,8 +47,12 @@ export const prospectsService = {
             relationship_type: f.relationship_type,
             owner_id: f.owner_id,
             interest_level_id: f.interest_level_id,
+            interest_level_code: f.interest_level_code,
             priority_id: f.priority_id,
             source_id: f.source_id,
+            without_contact_days: f.without_contact_days,
+            next_action_today: f.next_action_today,
+            created_since_days: f.created_since_days,
             page: f.page,
             page_size: 25,
           },

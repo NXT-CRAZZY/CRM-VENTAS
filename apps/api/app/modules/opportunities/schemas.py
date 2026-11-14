@@ -18,6 +18,7 @@ class OpportunityRead(ApiModel):
     id: UUID = Field(validation_alias="public_id")
     title: str
     description: str | None
+    client_status: str
     estimated_amount: Decimal | None
     probability: int | None
     expected_close_date: date | None
@@ -37,7 +38,7 @@ class OpportunityCreate(BaseModel):
     title: str = Field(min_length=2, max_length=200)
     description: str | None = Field(default=None, max_length=5000)
     stage_id: UUID
-    type_id: UUID | None = None
+    type_id: UUID | None = None  # "Qué se vende": obligatorio al crear salvo en Cerrado perdido
     loss_reason_id: UUID | None = None
     owner_id: UUID | None = None
     estimated_amount: float | None = Field(default=None, ge=0)

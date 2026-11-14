@@ -137,7 +137,7 @@ export function Checkbox({ className, ...props }: ComponentProps<typeof CB.Root>
   return (
     <CB.Root
       className={cn(
-        'peer flex size-4.5 shrink-0 items-center justify-center rounded-[5px] border border-zinc-300 bg-white shadow-xs transition-colors focus-visible:ring-2 focus-visible:ring-ring/40 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-primary',
+        'peer flex size-4.5 shrink-0 items-center justify-center rounded-[5px] border border-zinc-300 bg-card shadow-xs transition-colors focus-visible:ring-2 focus-visible:ring-ring/40 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-primary',
         className,
       )}
       {...props}
@@ -160,7 +160,7 @@ export function Tooltip({ content, children, side = 'top' }: { content: ReactNod
         <T.Content
           side={side}
           sideOffset={6}
-          className={cn('z-50 rounded-md bg-zinc-900 px-2.5 py-1.5 text-xs font-medium text-white shadow-md', popoverAnim)}
+          className={cn('z-50 rounded-md bg-ink-900 px-2.5 py-1.5 text-xs font-medium text-white shadow-md', popoverAnim)}
         >
           {content}
         </T.Content>

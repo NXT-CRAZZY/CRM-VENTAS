@@ -13,7 +13,7 @@ from app.core.deps import CurrentUser, DbSession, require
 from app.modules.imports.application.exporter import WeeklyReportExporter
 from app.modules.imports.application.use_cases import ImportService, WeeklyReportService
 from app.modules.imports.infrastructure.models import ImportJob
-from app.modules.imports.schemas import ImportJobDetailRead, ImportJobRead, ImportPreview, WeeklyReport, WeeklyReportFilters
+from app.modules.imports.schemas import ImportJobDetailRead, ImportJobRead, ImportPreview, WeeklyDetailItem, WeeklyReport, WeeklyReportFilters
 from app.modules.rbac.domain.permissions import P
 
 router = APIRouter(tags=["Importaciones"])
@@ -76,23 +76,40 @@ def get_import(job_id: UUID, service: ImportServiceDep, user: CurrentUser) -> Im
     return service.get_job(job_id, user)
 
 
-@router.get("/reports/weekly", response_model=WeeklyReport)
-def weekly_report(
-    service: ReportServiceDep,
-    user: CurrentUser,
+def _filters(
     date: str | None = None,
-) -> WeeklyReport:
-    return service.build(WeeklyReportFilters(date=date), user)
+    date_from: str | None = None,
+    date_to: str | None = None,
+    seller_id: str | None = None,
+    product_id: str | None = None,
+    type_id: str | None = None,
+) -> WeeklyReportFilters:
+    return WeeklyReportFilters(
+        date=date, date_from=date_from, date_to=date_to, seller_id=seller_id, product_id=product_id, type_id=type_id
+    )
+
+
+Filters = Annotated[WeeklyReportFilters, Depends(_filters)]
+
+
+@router.get("/reports/weekly", response_model=WeeklyReport)
+def weekly_report(service: ReportServiceDep, user: CurrentUser, filters: Filters) -> WeeklyReport:
+    return service.build(filters, user)
+
+
+@router.get("/reports/weekly/detail", response_model=list[WeeklyDetailItem])
+def weekly_report_detail(
+    service: ReportServiceDep, user: CurrentUser, filters: Filters, key: str, period: str = "month"
+) -> list[WeeklyDetailItem]:
+    return service.detail(filters, user, key, period)
 
 
 @router.get("/reports/weekly/export")
-def weekly_report_export(
-    db: DbSession,
-    user: CurrentUser,
-    report_date: str | None = None,
-) -> StreamingResponse:
-    target = datetime.strptime(report_date, "%Y-%m-%d").date() if report_date else date.today()
-    data = WeeklyReportExporter(db).export(target, user)
+def weekly_report_export(db: DbSession, user: CurrentUser, filters: Filters) -> StreamingResponse:
+    from app.modules.imports.application.weekly import local_today
+
+    target = datetime.strptime(filters.date, "%Y-%m-%d").date() if filters.date else local_today()
+    data = WeeklyReportExporter(db).export(target, user, filters)
     filename = f"FOR-VEN-001_{target.strftime('%Y-%m-%d')}.xlsx"
     return StreamingResponse(
         BytesIO(data),

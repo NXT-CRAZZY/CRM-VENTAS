@@ -5,7 +5,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.modules.opportunities.schemas import OpportunityProspectTiny
-from app.modules.prospects.schemas import UserTiny
+from app.modules.prospects.schemas import CatalogOptionTiny, UserTiny
 from app.shared.schemas import ApiModel
 
 
@@ -48,6 +48,10 @@ class QuoteRead(ApiModel):
     tax: Decimal
     total: Decimal
     notes: str | None
+    sent_at: datetime | None = None
+    accepted_at: datetime | None = None
+    rejected_at: datetime | None = None
+    reject_reason: CatalogOptionTiny | None = None
     created_at: datetime
     updated_at: datetime
 
@@ -80,6 +84,9 @@ class QuoteUpdate(BaseModel):
 
 class QuoteStatusChange(BaseModel):
     status: str = Field(pattern=r"^(DRAFT|SENT|ACCEPTED|REJECTED)$")
+    # Solo al rechazar: motivo (catálogo loss_reason) y si se cierra también la oportunidad como perdida.
+    reject_reason_id: UUID | None = None
+    close_opportunity: bool = False
 
 
 class QuoteFilters(BaseModel):

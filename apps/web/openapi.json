@@ -1657,6 +1657,24 @@
             }
           },
           {
+            "name": "interest_level_code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "C�digo del nivel de inter�s (ej. ALTO)",
+              "title": "Interest Level Code"
+            },
+            "description": "C�digo del nivel de inter�s (ej. ALTO)"
+          },
+          {
             "name": "priority_id",
             "in": "query",
             "required": false,
@@ -1688,6 +1706,58 @@
                 }
               ],
               "title": "Source Id"
+            }
+          },
+          {
+            "name": "without_contact_days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "maximum": 365,
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Without Contact Days"
+            }
+          },
+          {
+            "name": "next_action_today",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Next Action Today"
+            }
+          },
+          {
+            "name": "created_since_days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "maximum": 365,
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Created Since Days"
             }
           },
           {
@@ -2625,6 +2695,23 @@
             }
           },
           {
+            "name": "prospect_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Prospect Id"
+            }
+          },
+          {
             "name": "due_before",
             "in": "query",
             "required": false,
@@ -2654,6 +2741,72 @@
                 }
               ],
               "title": "Due After"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          },
+          {
+            "name": "type_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Type Id"
+            }
+          },
+          {
+            "name": "priority_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Priority Id"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "due_asc",
+                "due_desc",
+                "newest",
+                "priority"
+              ],
+              "type": "string",
+              "default": "due_asc",
+              "title": "Sort"
             }
           },
           {
@@ -3277,6 +3430,107 @@
             }
           },
           {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          },
+          {
+            "name": "date_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date From"
+            }
+          },
+          {
+            "name": "date_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date To"
+            }
+          },
+          {
+            "name": "owner_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Owner Id"
+            }
+          },
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Product Id"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "newest",
+                "oldest",
+                "amount_desc",
+                "amount_asc",
+                "expiring"
+              ],
+              "type": "string",
+              "default": "newest",
+              "title": "Sort"
+            }
+          },
+          {
             "name": "page",
             "in": "query",
             "required": false,
@@ -3725,6 +3979,86 @@
               ],
               "title": "Date"
             }
+          },
+          {
+            "name": "date_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date From"
+            }
+          },
+          {
+            "name": "date_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date To"
+            }
+          },
+          {
+            "name": "seller_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Seller Id"
+            }
+          },
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Product Id"
+            }
+          },
+          {
+            "name": "type_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Type Id"
+            }
           }
         ],
         "responses": {
@@ -3735,6 +4069,295 @@
                 "schema": {
                   "$ref": "#/components/schemas/WeeklyReport"
                 }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/weekly/detail": {
+      "get": {
+        "tags": [
+          "Importaciones"
+        ],
+        "summary": "Weekly Report Detail",
+        "operationId": "weekly_report_detail_api_v1_reports_weekly_detail_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Key"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "month",
+              "title": "Period"
+            }
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date"
+            }
+          },
+          {
+            "name": "date_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date From"
+            }
+          },
+          {
+            "name": "date_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date To"
+            }
+          },
+          {
+            "name": "seller_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Seller Id"
+            }
+          },
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Product Id"
+            }
+          },
+          {
+            "name": "type_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Type Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WeeklyDetailItem"
+                  },
+                  "title": "Response Weekly Report Detail Api V1 Reports Weekly Detail Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/weekly/export": {
+      "get": {
+        "tags": [
+          "Importaciones"
+        ],
+        "summary": "Weekly Report Export",
+        "operationId": "weekly_report_export_api_v1_reports_weekly_export_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date"
+            }
+          },
+          {
+            "name": "date_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date From"
+            }
+          },
+          {
+            "name": "date_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date To"
+            }
+          },
+          {
+            "name": "seller_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Seller Id"
+            }
+          },
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Product Id"
+            }
+          },
+          {
+            "name": "type_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Type Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           },
@@ -5387,6 +6010,88 @@
         ],
         "title": "DuplicateMatch"
       },
+      "FollowUpTask": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 2,
+            "title": "Title"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "assignee_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignee Id"
+          },
+          "type_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type Id"
+          },
+          "priority_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Priority Id"
+          },
+          "due_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Due At"
+          },
+          "remind_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remind At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "due_at"
+        ],
+        "title": "FollowUpTask",
+        "description": "Pr�xima acci�n de la interacci�n: los mismos campos que una tarea."
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -5854,18 +6559,6 @@
             "format": "uuid",
             "title": "Channel Id"
           },
-          "mode_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Mode Id"
-          },
           "result_id": {
             "type": "string",
             "format": "uuid",
@@ -5907,29 +6600,37 @@
             ],
             "title": "Notes"
           },
-          "next_action_desc": {
+          "follow_up_task": {
             "anyOf": [
               {
-                "type": "string",
-                "maxLength": 200
+                "$ref": "#/components/schemas/FollowUpTask"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "Next Action Desc"
+            ]
           },
-          "next_action_at": {
+          "opportunity_id": {
             "anyOf": [
               {
                 "type": "string",
-                "format": "date-time"
+                "format": "uuid"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Next Action At"
+            "title": "Opportunity Id"
+          },
+          "new_opportunity": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/InteractionNewOpportunity"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",
@@ -5939,6 +6640,51 @@
           "result_id"
         ],
         "title": "InteractionCreate"
+      },
+      "InteractionNewOpportunity": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 2,
+            "title": "Title"
+          },
+          "type_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Type Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "type_id"
+        ],
+        "title": "InteractionNewOpportunity",
+        "description": "Datos para crear una oportunidad nueva desde la interacci�n."
+      },
+      "InteractionOpportunityTiny": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "stage": {
+            "$ref": "#/components/schemas/CatalogOptionTiny"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "stage"
+        ],
+        "title": "InteractionOpportunityTiny"
       },
       "InteractionRead": {
         "properties": {
@@ -6060,6 +6806,37 @@
                 "type": "null"
               }
             ]
+          },
+          "follow_up_task": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TaskRead"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "opportunity": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/InteractionOpportunityTiny"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "opportunity_action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opportunity Action"
           }
         },
         "type": "object",
@@ -6109,18 +6886,6 @@
             ],
             "title": "Channel Id"
           },
-          "mode_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Mode Id"
-          },
           "result_id": {
             "anyOf": [
               {
@@ -6169,29 +6934,42 @@
             ],
             "title": "Notes"
           },
-          "next_action_desc": {
+          "follow_up_task": {
             "anyOf": [
               {
-                "type": "string",
-                "maxLength": 200
+                "$ref": "#/components/schemas/FollowUpTask"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "Next Action Desc"
+            ]
           },
-          "next_action_at": {
+          "remove_follow_up_task": {
+            "type": "boolean",
+            "title": "Remove Follow Up Task",
+            "default": false
+          },
+          "opportunity_id": {
             "anyOf": [
               {
                 "type": "string",
-                "format": "date-time"
+                "format": "uuid"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Next Action At"
+            "title": "Opportunity Id"
+          },
+          "new_opportunity": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/InteractionNewOpportunity"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",
@@ -6438,6 +7216,10 @@
             ],
             "title": "Description"
           },
+          "client_status": {
+            "type": "string",
+            "title": "Client Status"
+          },
           "estimated_amount": {
             "anyOf": [
               {
@@ -6536,6 +7318,7 @@
           "id",
           "title",
           "description",
+          "client_status",
           "estimated_amount",
           "probability",
           "expected_close_date",
@@ -8759,6 +9542,52 @@
             ],
             "title": "Notes"
           },
+          "sent_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sent At"
+          },
+          "accepted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted At"
+          },
+          "rejected_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rejected At"
+          },
+          "reject_reason": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CatalogOptionTiny"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
@@ -8813,6 +9642,23 @@
             "type": "string",
             "pattern": "^(DRAFT|SENT|ACCEPTED|REJECTED)$",
             "title": "Status"
+          },
+          "reject_reason_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reject Reason Id"
+          },
+          "close_opportunity": {
+            "type": "boolean",
+            "title": "Close Opportunity",
+            "default": false
           }
         },
         "type": "object",
@@ -9094,6 +9940,10 @@
             "type": "integer",
             "title": "Prospects Without Contact"
           },
+          "no_contact_days": {
+            "type": "integer",
+            "title": "No Contact Days"
+          },
           "high_interest_prospects": {
             "type": "integer",
             "title": "High Interest Prospects"
@@ -9113,6 +9963,7 @@
           "new_prospects_this_week",
           "follow_ups_today",
           "prospects_without_contact",
+          "no_contact_days",
           "high_interest_prospects",
           "upcoming_actions"
         ],
@@ -9742,6 +10593,11 @@
       },
       "UpcomingActionRead": {
         "properties": {
+          "task_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Task Id"
+          },
           "prospect_id": {
             "type": "string",
             "format": "uuid",
@@ -9770,6 +10626,7 @@
         },
         "type": "object",
         "required": [
+          "task_id",
           "prospect_id",
           "prospect_name",
           "action_type",
@@ -10028,6 +10885,87 @@
         ],
         "title": "ValidationError"
       },
+      "WeeklyDetailItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "prospect_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Prospect Id"
+          },
+          "prospect_name": {
+            "type": "string",
+            "title": "Prospect Name"
+          },
+          "day": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Day"
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "seller": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seller"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "prospect_id",
+          "prospect_name"
+        ],
+        "title": "WeeklyDetailItem"
+      },
       "WeeklyReport": {
         "properties": {
           "generated_at": {
@@ -10075,6 +11013,17 @@
             "type": "integer",
             "title": "New Clients Month"
           },
+          "range_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Range Label"
+          },
           "rows": {
             "items": {
               "$ref": "#/components/schemas/WeeklyReportRow"
@@ -10106,6 +11055,16 @@
             "type": "string",
             "title": "Label"
           },
+          "key": {
+            "type": "string",
+            "title": "Key",
+            "default": ""
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind",
+            "default": "count"
+          },
           "today": {
             "anyOf": [
               {
@@ -10117,6 +11076,18 @@
             ],
             "title": "Today"
           },
+          "week": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Week",
+            "default": 0
+          },
           "month": {
             "anyOf": [
               {
@@ -10127,6 +11098,20 @@
               }
             ],
             "title": "Month"
+          },
+          "range": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Range"
           }
         },
         "type": "object",

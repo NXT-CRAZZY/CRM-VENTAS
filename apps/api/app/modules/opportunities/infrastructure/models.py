@@ -5,6 +5,7 @@ from sqlalchemy import (
     Date,
     DateTime,
     ForeignKey,
+    CheckConstraint,
     Index,
     Numeric,
     String,
@@ -18,6 +19,7 @@ from app.core.db import Base, IdMixin, TimestampMixin
 class Opportunity(IdMixin, TimestampMixin, Base):
     __tablename__ = "opportunities"
     __table_args__ = (
+        CheckConstraint("client_status IN ('NUEVO','EXISTENTE')", name="ck_opportunities_client_status"),
         Index("ix_opportunities_prospect_stage", "prospect_id", "stage_id"),
         Index("ix_opportunities_owner_stage", "owner_id", "stage_id"),
         Index("ix_opportunities_expected_close", "expected_close_date"),
@@ -39,6 +41,9 @@ class Opportunity(IdMixin, TimestampMixin, Base):
     owner_id: Mapped[int | None] = mapped_column(
         BigInteger, ForeignKey("users.id", ondelete="SET NULL"), index=True, nullable=True
     )
+
+    # Cliente nuevo o existente al momento de crear la oportunidad (se congela, no se recalcula).
+    client_status: Mapped[str] = mapped_column(String(20), default="NUEVO", server_default="NUEVO", nullable=False)
 
     title: Mapped[str] = mapped_column(String(200), nullable=False)
     description: Mapped[str | None] = mapped_column(Text)

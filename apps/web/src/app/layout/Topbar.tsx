@@ -13,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/ui/menus'
+import { ThemeToggle } from '@/shared/theme/ThemeToggle'
 import { Logo } from '@/shared/ui/misc'
 
 export function UserMenu() {
@@ -60,10 +61,11 @@ export function UserMenu() {
 
 export function Topbar() {
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-zinc-200/70 bg-white/80 px-4 backdrop-blur-md supports-[backdrop-filter]:bg-white/70 sm:px-6 lg:h-16 lg:px-8">
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-zinc-200/70 bg-card/80 px-4 backdrop-blur-md supports-[backdrop-filter]:bg-card/70 sm:px-6 lg:h-16 lg:px-8">
       <Logo variant="mark" className="size-7 lg:hidden" />
       <span className="text-sm font-semibold text-zinc-900 lg:hidden">CRM</span>
-      <div className="ml-auto flex items-center gap-2">
+      <div className="ml-auto flex items-center gap-3">
+        <ThemeToggle />
         <UserMenu />
       </div>
     </header>

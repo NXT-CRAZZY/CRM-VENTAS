@@ -22,7 +22,7 @@ export function MobileNav() {
   return (
     <>
       <nav
-        className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-zinc-200/80 bg-white/90 backdrop-blur-md lg:hidden"
+        className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-zinc-200/80 bg-card/90 backdrop-blur-md lg:hidden"
         aria-label="Navegación móvil"
       >
         <div className="flex h-16">

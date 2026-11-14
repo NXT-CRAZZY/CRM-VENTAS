@@ -18,12 +18,16 @@ class InteractionRepository(Protocol):
     def count_interactions(self, prospect_id: int) -> int: ...
     def latest_interaction(self, prospect_id: int) -> Interaction | None: ...
     def add(self, interaction: Interaction) -> None: ...
+    def refresh_follow_up(self, interaction: Interaction) -> None: ...
+    def refresh_opportunity(self, interaction: Interaction) -> None: ...
+    def refresh_result(self, interaction: Interaction) -> None: ...
     def delete(self, interaction: Interaction) -> None: ...
     def get_prospect(self, public_id: UUID) -> Prospect | None: ...
     def get_prospect_id(self, public_id: UUID) -> int | None: ...
     def get_contact_id(self, public_id: UUID) -> int | None: ...
     def get_user_id(self, public_id: UUID) -> int | None: ...
     def get_catalog_option_id(self, public_id: UUID) -> int | None: ...
+    def get_catalog_option_code(self, internal_id: int) -> str | None: ...
     def get_catalog_option_id_by_code(self, catalog_code: str, option_code: str) -> int | None: ...
 
 
@@ -42,6 +46,7 @@ class SqlInteractionRepository:
                 selectinload(Interaction.mode),
                 selectinload(Interaction.result),
                 selectinload(Interaction.interest_level),
+                selectinload(Interaction.opportunity),
             )
         )
 
@@ -84,6 +89,18 @@ class SqlInteractionRepository:
         self.s.add(interaction)
         self.s.flush()
 
+    def refresh_follow_up(self, interaction: Interaction) -> None:
+        self.s.flush()
+        self.s.refresh(interaction, ["follow_up_task"])
+
+    def refresh_opportunity(self, interaction: Interaction) -> None:
+        self.s.flush()
+        self.s.refresh(interaction, ["opportunity"])
+
+    def refresh_result(self, interaction: Interaction) -> None:
+        self.s.flush()
+        self.s.refresh(interaction, ["result"])
+
     def delete(self, interaction: Interaction) -> None:
         interaction.deleted_at = func.now()
 
@@ -107,6 +124,9 @@ class SqlInteractionRepository:
 
     def get_catalog_option_id(self, public_id: UUID) -> int | None:
         return self.s.scalar(select(CatalogOption.id).where(CatalogOption.public_id == public_id))
+
+    def get_catalog_option_code(self, internal_id: int) -> str | None:
+        return self.s.scalar(select(CatalogOption.code).where(CatalogOption.id == internal_id))
 
     def get_catalog_option_id_by_code(self, catalog_code: str, option_code: str) -> int | None:
         return self.s.scalar(

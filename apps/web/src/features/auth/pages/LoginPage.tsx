@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { ease } from '@/shared/lib/motion'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
+import { ThemeToggle } from '@/shared/theme/ThemeToggle'
 import { Logo } from '@/shared/ui/misc'
 import { FormField } from '@/shared/ui/page'
 import { useLoginViewModel } from '../hooks/use-login-view-model'
@@ -16,7 +17,7 @@ export function LoginPage() {
   return (
     <div className="grid min-h-dvh lg:grid-cols-[1.05fr_1fr]">
       {/* Panel de marca (solo escritorio) */}
-      <div className="relative hidden overflow-hidden bg-ink-950 lg:flex lg:flex-col lg:justify-between lg:p-12">
+      <div className="keep-zinc relative hidden overflow-hidden bg-ink-950 lg:flex lg:flex-col lg:justify-between lg:p-12">
         <div
           className="pointer-events-none absolute -right-40 -top-40 size-[560px] rounded-full bg-brand-600/20 blur-3xl"
           aria-hidden
@@ -40,7 +41,8 @@ export function LoginPage() {
       </div>
 
       {/* Formulario */}
-      <div className="flex items-center justify-center px-5 py-10 sm:px-8">
+      <div className="relative flex items-center justify-center px-5 py-10 sm:px-8">
+        <ThemeToggle className="absolute right-4 top-4" />
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}

@@ -44,6 +44,9 @@ class Interaction(IdMixin, TimestampMixin, Base):
     result_id: Mapped[int] = mapped_column(
         BigInteger, ForeignKey("catalog_options.id", ondelete="RESTRICT"), index=True, nullable=False
     )
+    opportunity_id: Mapped[int | None] = mapped_column(
+        BigInteger, ForeignKey("opportunities.id", ondelete="SET NULL"), index=True, nullable=True
+    )
     interest_level_id: Mapped[int | None] = mapped_column(
         BigInteger, ForeignKey("catalog_options.id", ondelete="RESTRICT"), index=True, nullable=True
     )
@@ -63,3 +66,14 @@ class Interaction(IdMixin, TimestampMixin, Base):
     mode: Mapped["CatalogOption"] = relationship("CatalogOption", foreign_keys=[mode_id], lazy="joined")
     result: Mapped["CatalogOption"] = relationship("CatalogOption", foreign_keys=[result_id], lazy="joined")
     interest_level: Mapped["CatalogOption"] = relationship("CatalogOption", foreign_keys=[interest_level_id], lazy="joined")
+    # Oportunidad que esta interacción creó o movió de etapa (según su resultado).
+    opportunity: Mapped["Opportunity | None"] = relationship("Opportunity", lazy="joined")
+    # "Próxima acción" de la interacción: tarea vinculada (no eliminada), a lo sumo una.
+    follow_up_task: Mapped["Task | None"] = relationship(
+        "Task",
+        primaryjoin="and_(Task.interaction_id == Interaction.id, Task.deleted_at.is_(None))",
+        foreign_keys="Task.interaction_id",
+        uselist=False,
+        viewonly=True,
+        lazy="selectin",
+    )

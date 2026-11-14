@@ -1,6 +1,6 @@
-import { UsersRound } from 'lucide-react'
+import { Clock, Flame, Phone, UserPlus, UsersRound, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useNavigate, useSearchParams } from 'react-router'
 import { P, usePermissions } from '@/shared/auth/permissions'
 import { formatPhone } from '@/shared/lib/format'
 import { Avatar } from '@/shared/ui/avatar'
@@ -37,6 +37,45 @@ type ActionState =
   | { type: 'delete'; prospect: Prospect }
   | null
 
+function QuickFilterChip({
+  active,
+  onClick,
+  icon: Icon,
+  label,
+}: {
+  active: boolean
+  onClick: () => void
+  icon: React.ElementType
+  label: string
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`
+        inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium ring-1 ring-inset transition-colors
+        ${active ? 'bg-brand-50 text-brand-700 ring-brand-200' : 'bg-card text-zinc-600 ring-zinc-200 hover:bg-zinc-50 hover:text-zinc-900'}
+      `}
+    >
+      <Icon className="size-3.5" />
+      {label}
+    </button>
+  )
+}
+
+function hasAdvancedFilters(filters: ReturnType<typeof useProspectsViewModel>['filters']) {
+  return (
+    filters.without_contact_days != null ||
+    filters.next_action_today === true ||
+    filters.created_since_days != null ||
+    filters.interest_level_code != null ||
+    filters.relationship_type != null ||
+    filters.person_type != null ||
+    filters.owner_id != null ||
+    filters.priority_id != null ||
+    filters.source_id != null
+  )
+}
+
 export default function ProspectsPage() {
   const { can } = usePermissions()
   const canCreate = can(P.PROSPECTS_CREATE)
@@ -45,10 +84,26 @@ export default function ProspectsPage() {
   const canDelete = can(P.PROSPECTS_DELETE)
 
   const navigate = useNavigate()
-  const [editing, setEditing] = useState<Prospect | 'new' | null>(null)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [editing, setEditing] = useState<Prospect | 'new' | null>(searchParams.get('action') === 'new' ? 'new' : null)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [bulkAssignOpen, setBulkAssignOpen] = useState(false)
   const [action, setAction] = useState<ActionState>(null)
+
+  useEffect(() => {
+    if (editing !== 'new' && searchParams.get('action') === 'new') {
+      setEditing('new')
+    }
+  }, [searchParams, editing])
+
+  const handleCloseForm = () => {
+    setEditing(null)
+    if (searchParams.get('action') === 'new') {
+      const next = new URLSearchParams(searchParams)
+      next.delete('action')
+      setSearchParams(next)
+    }
+  }
 
   const vm = useProspectsViewModel()
   const visibleIds = useMemo(() => vm.prospects.map((p) => p.id), [vm.prospects])
@@ -193,10 +248,7 @@ export default function ProspectsPage() {
         <div className="flex flex-col gap-3 border-b border-zinc-100 p-4 sm:flex-row sm:items-center sm:justify-between">
           <SearchInput
             value={vm.search}
-            onChange={(v) => {
-              vm.setSearch(v)
-              vm.setFilters((f) => ({ ...f, page: 1 }))
-            }}
+            onChange={(v) => vm.setSearch(v)}
             placeholder="Buscar por nombre, correo, teléfono, documento o código"
             className="sm:max-w-md sm:flex-1"
           />
@@ -205,6 +257,44 @@ export default function ProspectsPage() {
             onChange={(v) => vm.setFilters((f) => ({ ...f, status: v as Prospect['status'], page: 1 }))}
             options={STATUS_OPTIONS}
           />
+        </div>
+
+        <div className="flex flex-wrap gap-2 border-b border-zinc-100 bg-zinc-50/50 px-4 py-3">
+          <QuickFilterChip
+            active={vm.filters.without_contact_days === 7}
+            onClick={() => vm.setFilters((f) => ({ ...f, without_contact_days: f.without_contact_days === 7 ? undefined : 7, page: 1 }))}
+            icon={Clock}
+            label="Sin contacto > 7 días"
+          />
+          <QuickFilterChip
+            active={vm.filters.next_action_today === true}
+            onClick={() => vm.setFilters((f) => ({ ...f, next_action_today: f.next_action_today ? undefined : true, page: 1 }))}
+            icon={Phone}
+            label="Seguimientos hoy"
+          />
+          <QuickFilterChip
+            active={vm.filters.created_since_days === 7}
+            onClick={() => vm.setFilters((f) => ({ ...f, created_since_days: f.created_since_days === 7 ? undefined : 7, page: 1 }))}
+            icon={UserPlus}
+            label="Nuevos últimos 7 días"
+          />
+          <QuickFilterChip
+            active={vm.filters.interest_level_code === 'ALTO'}
+            onClick={() => vm.setFilters((f) => ({ ...f, interest_level_code: f.interest_level_code === 'ALTO' ? undefined : 'ALTO', page: 1 }))}
+            icon={Flame}
+            label="Alto interés"
+          />
+          {hasAdvancedFilters(vm.filters) && (
+            <button
+              onClick={() => {
+                vm.setSearch('')
+                vm.setFilters({ page: 1, status: vm.filters.status })
+              }}
+              className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700"
+            >
+              <X className="size-3.5" /> Limpiar filtros
+            </button>
+          )}
         </div>
 
         {selectedIds.length > 0 && (
@@ -267,7 +357,7 @@ export default function ProspectsPage() {
             </div>
           )}
           empty={
-            vm.search || vm.filters.status !== 'ACTIVO' ? (
+            vm.search || vm.filters.status !== 'ACTIVO' || hasAdvancedFilters(vm.filters) ? (
               <NoResults onClear={() => { vm.setSearch(''); vm.setFilters({ page: 1, status: 'ACTIVO' }) }} />
             ) : (
               <EmptyState icon={<UsersRound />} title="Sin prospectos" />
@@ -277,7 +367,7 @@ export default function ProspectsPage() {
         />
       </Card>
 
-      {(canCreate || canUpdate) && <ProspectFormSheet prospect={editing} onClose={() => setEditing(null)} />}
+      {(canCreate || canUpdate) && <ProspectFormSheet prospect={editing} onClose={handleCloseForm} />}
 
       <ProspectAssignDialog
         open={action?.type === 'assign'}

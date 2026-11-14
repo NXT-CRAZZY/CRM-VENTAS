@@ -167,7 +167,7 @@ export function UserFormSheet({ user, onClose, onSaved }: { user: User | 'new' |
               Genera una contraseña temporal; el usuario deberá cambiarla al ingresar.
             </p>
             {issuedPassword ? (
-              <div className="mt-3 flex items-center gap-2 rounded-md border border-brand-200 bg-white px-3 py-2">
+              <div className="mt-3 flex items-center gap-2 rounded-md border border-brand-200 bg-card px-3 py-2">
                 <code className="flex-1 font-mono text-sm text-zinc-900">{issuedPassword}</code>
                 <Button
                   size="icon-sm"

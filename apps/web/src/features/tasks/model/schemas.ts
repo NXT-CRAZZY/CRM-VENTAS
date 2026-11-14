@@ -11,3 +11,8 @@ export const taskFormSchema = z.object({
 })
 
 export type TaskFormValues = z.infer<typeof taskFormSchema>
+
+/** Próxima acción de una interacción: igual que una tarea, pero la fecha de vencimiento es obligatoria. */
+export const followUpTaskSchema = taskFormSchema.extend({
+  due_at: z.string().min(1, 'Indica la fecha y hora'),
+})

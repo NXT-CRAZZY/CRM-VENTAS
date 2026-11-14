@@ -45,6 +45,7 @@ export function OpportunityCard({
       )}
 
       <div className="mt-2 flex flex-wrap items-center gap-1.5">
+        <Badge tone={opportunity.client_status === 'EXISTENTE' ? 'info' : 'neutral'}>{opportunity.client_status === 'EXISTENTE' ? 'Existente' : 'Nuevo'}</Badge>
         {opportunity.type && <Badge tone="neutral">{opportunity.type.name}</Badge>}
         {opportunity.probability !== null && opportunity.probability !== undefined && (
           <Badge tone="brand">{opportunity.probability}%</Badge>

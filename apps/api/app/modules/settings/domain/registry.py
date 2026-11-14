@@ -25,8 +25,10 @@ class ProspectSettings(BaseModel):
 class AlertSettings(BaseModel):
     uncontacted_hours: int = Field(24, ge=1, le=720, title="Horas máximas sin primer contacto")
     no_followup_days: int = Field(7, ge=1, le=180, title="Días sin seguimiento para alertar")
+    no_contact_days: int = Field(7, ge=1, le=180, title="Días sin contacto para considerar prospecto desatendido")
     quote_expiring_days: int = Field(3, ge=1, le=60, title="Días de aviso antes del vencimiento de cotización")
     quote_no_response_days: int = Field(5, ge=1, le=90, title="Días de cotización enviada sin respuesta")
+    quote_validity_days: int = Field(15, ge=1, le=365, title="Días de vigencia por defecto de una cotización")
     high_value_amount: Decimal = Field(Decimal("5000"), ge=0, title="Monto (S/) considerado de alto valor")
     max_attempts: int = Field(6, ge=1, le=50, title="Intentos de contacto que disparan alerta")
     renewal_notice_days: list[int] = Field(

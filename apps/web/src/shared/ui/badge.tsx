@@ -13,7 +13,7 @@ const badgeVariants = cva(
         warning: 'bg-warning-soft text-amber-800 ring-amber-200',
         danger: 'bg-danger-soft text-red-800 ring-red-200',
         info: 'bg-info-soft text-blue-800 ring-blue-200',
-        dark: 'bg-zinc-900 text-white ring-zinc-900',
+        dark: 'bg-ink-900 text-white ring-ink-900',
       },
     },
     defaultVariants: { tone: 'neutral' },

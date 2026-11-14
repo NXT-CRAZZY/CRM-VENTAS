@@ -67,7 +67,7 @@ PERMISSIONS: list[PermissionDef] = [
     PermissionDef(P.PROSPECTS_DELETE, "Prospectos", "Eliminar (papelera) prospectos"),
     PermissionDef(P.PROSPECTS_CONVERT, "Prospectos", "Convertir prospectos en clientes"),
     PermissionDef(P.INTERACTIONS_CREATE, "Seguimiento", "Registrar interacciones"),
-    PermissionDef(P.TASKS_MANAGE, "Seguimiento", "Gestionar tareas y recordatorios"),
+    PermissionDef(P.TASKS_MANAGE, "Seguimiento", "Gestionar tareas"),
     PermissionDef(P.OPPORTUNITIES_MANAGE, "Pipeline", "Gestionar oportunidades"),
     PermissionDef(P.QUOTES_MANAGE, "Cotizaciones", "Gestionar cotizaciones"),
     PermissionDef(P.SALES_MANAGE, "Ventas", "Registrar y editar ventas"),

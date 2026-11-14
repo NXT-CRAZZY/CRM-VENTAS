@@ -76,7 +76,7 @@ export default function CatalogsPage() {
                   onClick={() => setCode(c.code)}
                   className={cn(
                     'flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors',
-                    active ? 'bg-white font-medium text-zinc-900 shadow-xs ring-1 ring-zinc-200/80' : 'text-zinc-600 hover:bg-white/70 hover:text-zinc-900',
+                    active ? 'bg-card font-medium text-zinc-900 shadow-xs ring-1 ring-zinc-200/80' : 'text-zinc-600 hover:bg-card/70 hover:text-zinc-900',
                   )}
                 >
                   {c.name}

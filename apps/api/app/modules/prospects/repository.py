@@ -1,9 +1,11 @@
+from datetime import UTC, datetime, timedelta
 from typing import Protocol
 from uuid import UUID
 
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session, joinedload, selectinload
 
+from app.modules.catalogs.infrastructure.models import Catalog, CatalogOption
 from app.modules.prospects.domain.enums import PersonType
 from app.modules.prospects.infrastructure.models import Prospect, ProspectAssignment, ProspectStatusHistory, Tag
 from app.modules.prospects.schemas import DuplicateCheckRequest, ProspectFilters
@@ -78,6 +80,36 @@ class SqlProspectRepository:
             tag_internal_ids = [t.id for t in self.get_tags_by_public_ids(filters.tag_ids)]
             if tag_internal_ids:
                 stmt = stmt.where(Prospect.tags.any(Tag.id.in_(tag_internal_ids)))
+        if filters.interest_level_code:
+            interest_id = self.get_catalog_option_id_by_code("interest_level", filters.interest_level_code.upper())
+            if interest_id:
+                stmt = stmt.where(Prospect.interest_level_id == interest_id)
+        if filters.without_contact_days is not None:
+            cutoff = datetime.now(UTC) - timedelta(days=filters.without_contact_days)
+            stmt = stmt.where(
+                Prospect.deleted_at.is_(None),
+                Prospect.relationship_type == "PROSPECTO",
+                or_(Prospect.last_contact_at.is_(None), Prospect.last_contact_at < cutoff),
+            )
+        if filters.next_action_today:
+            from app.shared.timeutil import local_day_bounds
+
+            start_of_day, end_of_day = local_day_bounds()
+            from app.modules.tasks.infrastructure.models import Task
+
+            stmt = stmt.where(
+                Prospect.id.in_(
+                    select(Task.prospect_id).where(
+                        Task.status == "PENDING",
+                        Task.deleted_at.is_(None),
+                        Task.due_at >= start_of_day,
+                        Task.due_at < end_of_day,
+                    )
+                )
+            )
+        if filters.created_since_days is not None:
+            since = datetime.now(UTC) - timedelta(days=filters.created_since_days)
+            stmt = stmt.where(Prospect.created_at >= since)
         if filters.q:
             q = filters.q.strip()
             like = f"%{q}%"

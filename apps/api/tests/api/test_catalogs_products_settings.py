@@ -19,19 +19,22 @@ def test_bundle_has_legacy_excel_codes(client: TestClient, sales_headers: dict[s
     assert legacy == {
         "C": "Correo",
         "T": "Teléfono",
-        "V": "Visita",
-        "W": "Web",
-        "F": "Facebook",
-        "R": "Referencia de otro cliente",
+        "V": "Visita presencial",
+        "W": "Formulario web",
+        "F": "Messenger / Facebook",
     }
     assert {o["legacy_code"] for o in data["contact_mode"]} == {"P", "R"}
 
 
 def test_opportunity_type_maps_legacy_a_n(client: TestClient, sales_headers: dict[str, str]) -> None:
     data = client.get(f"{API}/catalogs/bundle", params={"codes": "opportunity_type"}, headers=sales_headers).json()
-    assert {o["legacy_code"]: o["code"] for o in data["catalogs"]["opportunity_type"]} == {
+    options = data["catalogs"]["opportunity_type"]
+    assert {o["legacy_code"]: o["code"] for o in options if o["legacy_code"]} == {
         "A": "ACTUALIZACION",
         "N": "NUEVO",
+    }
+    assert {o["code"] for o in options} == {
+        "NUEVO", "ACTUALIZACION", "USUARIOS_ADICIONALES", "CAMBIO_PLAN",
     }
 
 

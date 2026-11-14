@@ -10,6 +10,7 @@ from app.core.errors import ForbiddenError, NotFoundError
 from app.modules.catalogs.infrastructure.models import CatalogOption
 from app.modules.imports.application.parser import parse_for_ven_001
 from app.modules.imports.infrastructure.models import ImportJob, ImportRowError
+from app.modules.imports.application.weekly import build_weekly_detail, build_weekly_report
 from app.modules.imports.schemas import ImportJobDetailRead, ImportPreview, ImportPreviewRow, WeeklyReport, WeeklyReportFilters, WeeklyReportRow
 from app.modules.interactions.infrastructure.models import Interaction
 from app.modules.opportunities.infrastructure.models import Opportunity
@@ -17,6 +18,14 @@ from app.modules.prospects.infrastructure.models import Prospect, ProspectContac
 from app.modules.rbac.domain.permissions import P
 from app.modules.users.infrastructure.models import User
 from app.shared.documents import is_valid_ruc, ruc_person_type
+
+
+def _local_today() -> date:
+    from zoneinfo import ZoneInfo
+
+    from app.core.config import get_settings
+
+    return datetime.now(ZoneInfo(get_settings().timezone)).date()
 
 
 class ImportService:
@@ -323,102 +332,7 @@ class WeeklyReportService:
         self.s = session
 
     def build(self, filters: WeeklyReportFilters, user: User) -> WeeklyReport:
-        target = self._parse_date(filters.date) if filters.date else date.today()
-        start_of_month = target.replace(day=1)
-        next_day = target + timedelta(days=1)
+        return build_weekly_report(self.s, user, filters)
 
-        result_ids = self._result_ids()
-        stage_won_id = self._stage_won_id()
-
-        quotes_today = self._count_interactions(target, next_day, result_ids.get("COTIZACION"))
-        quotes_month = self._count_interactions(start_of_month, next_day, result_ids.get("COTIZACION"))
-
-        sales_today, sales_update_today, sales_new_today = self._sales_summary(target, next_day, stage_won_id)
-        sales_month, sales_update_month, sales_new_month = self._sales_summary(start_of_month, next_day, stage_won_id)
-
-        new_clients_today = self._count_new_clients(target, next_day)
-        new_clients_month = self._count_new_clients(start_of_month, next_day)
-
-        rows = [
-            WeeklyReportRow(label="Cotizaciones", today=quotes_today, month=quotes_month),
-            WeeklyReportRow(label="Ventas totales", today=sales_today, month=sales_month),
-            WeeklyReportRow(label="Ventas actualización", today=sales_update_today, month=sales_update_month),
-            WeeklyReportRow(label="Ventas nuevas", today=sales_new_today, month=sales_new_month),
-            WeeklyReportRow(label="Nuevos clientes", today=new_clients_today, month=new_clients_month),
-        ]
-
-        return WeeklyReport(
-            generated_at=datetime.now(),
-            quotes_today=quotes_today,
-            quotes_month=quotes_month,
-            sales_today=sales_today,
-            sales_month=sales_month,
-            sales_update_today=sales_update_today,
-            sales_update_month=sales_update_month,
-            sales_new_today=sales_new_today,
-            sales_new_month=sales_new_month,
-            new_clients_today=new_clients_today,
-            new_clients_month=new_clients_month,
-            rows=rows,
-        )
-
-    def _parse_date(self, value: str) -> date:
-        return datetime.strptime(value, "%Y-%m-%d").date()
-
-    def _result_ids(self) -> dict[str, int]:
-        return {
-            opt.code: opt.id
-            for opt in self.s.scalars(
-                select(CatalogOption).join(CatalogOption.catalog).where(CatalogOption.catalog.has(code="contact_result"))
-            )
-        }
-
-    def _stage_won_id(self) -> int | None:
-        return self.s.scalar(
-            select(CatalogOption.id).join(CatalogOption.catalog).where(CatalogOption.catalog.has(code="pipeline_stage"), CatalogOption.code == "CERRADO_GANADO")
-        )
-
-    def _count_interactions(self, start: date, end: date, result_id: int | None) -> int:
-        if result_id is None:
-            return 0
-        return self.s.scalar(
-            select(func.count(Interaction.id)).where(
-                Interaction.result_id == result_id,
-                Interaction.occurred_at >= datetime.combine(start, time.min),
-                Interaction.occurred_at < datetime.combine(end, time.min),
-                Interaction.deleted_at.is_(None),
-            )
-        ) or 0
-
-    def _sales_summary(self, start: date, end: date, stage_won_id: int | None) -> tuple[float, float, float]:
-        if stage_won_id is None:
-            return 0.0, 0.0, 0.0
-        actualizacion_id = self.s.scalar(
-            select(CatalogOption.id).join(CatalogOption.catalog).where(CatalogOption.catalog.has(code="opportunity_type"), CatalogOption.code == "ACTUALIZACION")
-        )
-        nuevo_id = self.s.scalar(
-            select(CatalogOption.id).join(CatalogOption.catalog).where(CatalogOption.catalog.has(code="opportunity_type"), CatalogOption.code == "NUEVO")
-        )
-
-        rows = self.s.execute(
-            select(Opportunity.estimated_amount, Opportunity.type_id).where(
-                Opportunity.stage_id == stage_won_id,
-                Opportunity.actual_close_date >= start,
-                Opportunity.actual_close_date < end,
-                Opportunity.deleted_at.is_(None),
-            )
-        ).all()
-
-        total = sum(float(r.estimated_amount or 0) for r in rows)
-        update = sum(float(r.estimated_amount or 0) for r in rows if r.type_id == actualizacion_id)
-        new = sum(float(r.estimated_amount or 0) for r in rows if r.type_id == nuevo_id)
-        return total, update, new
-
-    def _count_new_clients(self, start: date, end: date) -> int:
-        return self.s.scalar(
-            select(func.count(Prospect.id)).where(
-                Prospect.relationship_type == "CLIENTE",
-                Prospect.converted_at >= datetime.combine(start, time.min),
-                Prospect.converted_at < datetime.combine(end, time.min),
-            )
-        ) or 0
+    def detail(self, filters: WeeklyReportFilters, user: User, key: str, period: str):
+        return build_weekly_detail(self.s, user, filters, key, period)

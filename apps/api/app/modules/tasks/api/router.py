@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Annotated
+from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
@@ -40,14 +40,24 @@ def list_tasks(
     params: Annotated[PageParams, Depends(page_params)],
     status: str | None = None,
     assignee_id: UUID | None = None,
+    prospect_id: UUID | None = None,
     due_before: str | None = None,
     due_after: str | None = None,
+    search: str | None = None,
+    type_id: UUID | None = None,
+    priority_id: UUID | None = None,
+    sort: Literal["due_asc", "due_desc", "newest", "priority"] = "due_asc",
 ) -> Page[TaskRead]:
     filters = {
         "status": status,
         "assignee_id": assignee_id,
+        "prospect_id": prospect_id,
         "due_before": _parse_dt(due_before),
         "due_after": _parse_dt(due_after),
+        "search": search,
+        "type_id": type_id,
+        "priority_id": priority_id,
+        "sort": sort,
     }
     return service.list_tasks({k: v for k, v in filters.items() if v is not None}, params, user)
 

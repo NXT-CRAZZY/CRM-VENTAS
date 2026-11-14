@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { type Schemas } from '@/shared/api/client'
 import { errorMessage } from '@/shared/api/errors'
+import { tasksKeys } from '@/features/tasks/api/tasks-service'
 import { P, usePermissions } from '@/shared/auth/permissions'
 import { formatDateTime } from '@/shared/lib/format'
 import { Badge, ColorBadge } from '@/shared/ui/badge'
@@ -41,6 +42,8 @@ export function InteractionsSection({
       toast.success('Interacción eliminada')
       queryClient.invalidateQueries({ queryKey: interactionsKeys.list(prospectId) })
       queryClient.invalidateQueries({ queryKey: ['prospects', 'detail', prospectId] })
+      queryClient.invalidateQueries({ queryKey: tasksKeys.all })
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] })
       setDeleting(null)
     },
     onError: (e) => toast.error(errorMessage(e)),
@@ -92,11 +95,24 @@ export function InteractionsSection({
                       {i.contact && <> · {i.contact.full_name}</>}
                     </p>
                     {i.notes && <p className="mt-2 whitespace-pre-wrap text-zinc-700">{i.notes}</p>}
-                    {i.next_action_desc && (
-                      <p className="mt-2 text-xs text-brand-700">
-                        Próxima acción: <strong>{i.next_action_desc}</strong>
-                        {i.next_action_at && <> · {formatDateTime(i.next_action_at)}</>}
+                    {i.opportunity && (
+                      <p className="mt-2 text-xs text-zinc-500">
+                        Oportunidad: <strong>{i.opportunity.title}</strong> · {i.opportunity.stage.name}
                       </p>
+                    )}
+                    {i.follow_up_task ? (
+                      <p className="mt-2 text-xs text-brand-700">
+                        Próxima acción: <strong>{i.follow_up_task.title}</strong>
+                        {i.follow_up_task.due_at && <> · {formatDateTime(i.follow_up_task.due_at)}</>}
+                        {i.follow_up_task.status !== 'PENDING' && <> · {i.follow_up_task.status === 'DONE' ? 'Hecha' : 'Cancelada'}</>}
+                      </p>
+                    ) : (
+                      i.next_action_desc && (
+                        <p className="mt-2 text-xs text-zinc-500">
+                          Próxima acción (histórica): <strong>{i.next_action_desc}</strong>
+                          {i.next_action_at && <> · {formatDateTime(i.next_action_at)}</>}
+                        </p>
+                      )
                     )}
                   </div>
                   {canUpdate && (

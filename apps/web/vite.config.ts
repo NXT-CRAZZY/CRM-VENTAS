@@ -10,7 +10,7 @@ export default defineConfig({
   server: {
     port: 5173,
     // Mismo origen en desarrollo: la cookie del refresh token (SameSite=Strict) funciona sin CORS.
-    proxy: { '/api': { target: process.env.VITE_API_PROXY ?? 'http://localhost:8001', changeOrigin: true } },
+    proxy: { '/api': { target: process.env.VITE_API_PROXY ?? 'http://127.0.0.1:8000', changeOrigin: true } },
   },
   build: {
     rollupOptions: {

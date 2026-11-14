@@ -34,3 +34,25 @@ export function generateTempPassword() {
   const pick = (set: string) => set[crypto.getRandomValues(new Uint32Array(1))[0] % set.length]
   return Array.from({ length: 6 }, () => pick(letters)).join('') + pick(digits) + pick(digits) + pick(digits)
 }
+
+export function emptyToNull<T>(v: T): T | null {
+  if (v === '' || v === undefined) return null
+  return v
+}
+
+/** Valor de un input datetime-local (hora local) → ISO UTC para la API. */
+export function toISOString(value: string): string {
+  if (!value) return ''
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+  return date.toISOString()
+}
+
+/** ISO de la API → valor para un input datetime-local (YYYY-MM-DDTHH:mm, hora local). */
+export function fromISOString(value: string | null | undefined): string {
+  if (!value) return ''
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return ''
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
+}

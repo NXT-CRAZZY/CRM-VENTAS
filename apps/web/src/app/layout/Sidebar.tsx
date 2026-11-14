@@ -86,7 +86,7 @@ export function Sidebar() {
     <motion.aside
       animate={{ width: collapsed ? 72 : 256 }}
       transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-      className="sticky top-0 hidden h-dvh shrink-0 flex-col bg-ink-950 lg:flex"
+      className="keep-zinc sticky top-0 hidden h-dvh shrink-0 flex-col bg-ink-950 lg:flex"
     >
       <div className={cn('flex h-16 items-center', collapsed ? 'justify-center' : 'px-5')}>
         <Logo onDark variant={collapsed ? 'mark' : 'full'} className={collapsed ? 'size-8' : 'h-7 w-auto'} />

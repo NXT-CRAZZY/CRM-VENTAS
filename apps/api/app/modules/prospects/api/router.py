@@ -60,8 +60,12 @@ def list_prospects(
     relationship_type: str | None = None,
     owner_id: UUID | None = None,
     interest_level_id: UUID | None = None,
+    interest_level_code: str | None = Query(None, description="Código del nivel de interés (ej. ALTO)"),
     priority_id: UUID | None = None,
     source_id: UUID | None = None,
+    without_contact_days: int | None = Query(None, ge=1, le=365),
+    next_action_today: bool | None = Query(None),
+    created_since_days: int | None = Query(None, ge=1, le=365),
 ) -> Page[ProspectRead]:
     _read_scope(user)
     filters = ProspectFilters(
@@ -71,8 +75,12 @@ def list_prospects(
         relationship_type=relationship_type,
         owner_id=owner_id,
         interest_level_id=interest_level_id,
+        interest_level_code=interest_level_code,
         priority_id=priority_id,
         source_id=source_id,
+        without_contact_days=without_contact_days,
+        next_action_today=next_action_today,
+        created_since_days=created_since_days,
     )
     return service.list_prospects(filters, params, user)
 

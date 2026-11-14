@@ -71,3 +71,33 @@ def test_delete_task(client: TestClient, admin_headers: dict) -> None:
     r = client.get(f"{API}/tasks", headers=admin_headers)
     assert r.status_code == 200, r.text
     assert len(r.json()["items"]) == 0
+
+
+def test_tasks_filters_and_sort(client: TestClient, admin_headers: dict) -> None:
+    prospect = _create_prospect(client, admin_headers)
+    now = datetime.now(timezone.utc)
+
+    def make(title: str, days: int, **extra) -> dict:
+        due = (now + timedelta(days=days)).isoformat().replace("+00:00", "Z")
+        r = client.post(
+            f"{API}/tasks",
+            json={"prospect_id": prospect["id"], "title": title, "due_at": due, **extra},
+            headers=admin_headers,
+        )
+        assert r.status_code == 201, r.text
+        return r.json()
+
+    a = make("Zeta cercana", 1, priority_id=_priority_id(client, admin_headers, "BAJA"))
+    b = make("Alfa lejana", 5, priority_id=_priority_id(client, admin_headers, "ALTA"), type_id=_type_id(client, admin_headers, "LLAMAR"))
+
+    def ids(**params) -> list[str]:
+        r = client.get(f"{API}/tasks", headers=admin_headers, params={"prospect_id": prospect["id"], **params})
+        assert r.status_code == 200, r.text
+        return [t["id"] for t in r.json()["items"]]
+
+    assert ids() == [a["id"], b["id"]]
+    assert ids(sort="due_desc") == [b["id"], a["id"]]
+    assert ids(sort="priority") == [b["id"], a["id"]]
+    assert ids(search="alfa") == [b["id"]]
+    assert ids(priority_id=a["priority"]["id"]) == [a["id"]]
+    assert ids(type_id=b["type"]["id"]) == [b["id"]]

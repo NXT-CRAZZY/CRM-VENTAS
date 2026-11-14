@@ -101,7 +101,7 @@ export default function RolesPage() {
                   onClick={() => setSelectedId(r.id)}
                   className={cn(
                     'relative w-full rounded-lg border p-4 text-left transition-all duration-150',
-                    active ? 'border-brand-300 bg-white shadow-sm' : 'border-zinc-200/80 bg-white/60 hover:border-zinc-300 hover:bg-white',
+                    active ? 'border-brand-300 bg-card shadow-sm' : 'border-zinc-200/80 bg-card/60 hover:border-zinc-300 hover:bg-card',
                   )}
                 >
                   {active && <motion.span layoutId="role-active" className="absolute inset-y-3 left-0 w-[3px] rounded-r-full bg-brand-600" />}
@@ -173,11 +173,11 @@ export default function RolesPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 16 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-x-4 bottom-20 z-30 mx-auto flex max-w-xl items-center justify-between gap-3 rounded-xl bg-zinc-900 px-4 py-3 text-sm text-white shadow-lg lg:bottom-6"
+            className="fixed inset-x-4 bottom-20 z-30 mx-auto flex max-w-xl items-center justify-between gap-3 rounded-xl bg-ink-900 px-4 py-3 text-sm text-white shadow-lg lg:bottom-6"
           >
             <span>Tienes cambios sin guardar</span>
             <div className="flex gap-2">
-              <Button size="sm" variant="ghost" className="text-zinc-300 hover:bg-white/10 hover:text-white" onClick={() => setDraft(new Set(selected?.permissions))}>
+              <Button size="sm" variant="ghost" className="text-zinc-300 hover:bg-card/10 hover:text-white" onClick={() => setDraft(new Set(selected?.permissions))}>
                 Descartar
               </Button>
               <Button size="sm" loading={save.isPending} onClick={() => save.mutate()}>

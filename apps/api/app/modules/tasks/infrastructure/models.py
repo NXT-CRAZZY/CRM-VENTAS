@@ -28,6 +28,12 @@ class Task(IdMixin, TimestampMixin, Base):
     opportunity_id: Mapped[int | None] = mapped_column(
         BigInteger, ForeignKey("opportunities.id", ondelete="SET NULL"), index=True, nullable=True
     )
+    quote_id: Mapped[int | None] = mapped_column(
+        BigInteger, ForeignKey("quotes.id", ondelete="SET NULL"), index=True, nullable=True
+    )
+    interaction_id: Mapped[int | None] = mapped_column(
+        BigInteger, ForeignKey("interactions.id", ondelete="SET NULL"), index=True, nullable=True
+    )
     assignee_id: Mapped[int | None] = mapped_column(
         BigInteger, ForeignKey("users.id", ondelete="SET NULL"), index=True, nullable=True
     )

@@ -158,7 +158,7 @@ class AlertService:
         stmt = select(Quote).where(
             Quote.deleted_at.is_(None),
             Quote.status == "SENT",
-            Quote.updated_at < since,
+            func.coalesce(Quote.sent_at, Quote.updated_at) < since,
         )
         if P.PROSPECTS_READ_ALL not in user.permission_codes:
             stmt = stmt.where(Quote.prospect.has(Prospect.owner_id == user.id))

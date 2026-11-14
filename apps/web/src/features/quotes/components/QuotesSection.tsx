@@ -3,28 +3,14 @@ import { FileText, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { errorMessage } from '@/shared/api/errors'
-import { formatDate, formatMoney } from '@/shared/lib/format'
-import { Badge } from '@/shared/ui/badge'
+import { formatDate } from '@/shared/lib/format'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import { ConfirmDialog } from '@/shared/ui/misc'
 
 import { quotesKeys, quotesService, type Quote } from '../api/quotes-service'
+import { QuoteActions, QuoteDetails, QuoteStatusBadge } from './QuoteActions'
 import { QuoteFormSheet } from './QuoteFormSheet'
-
-const STATUS_LABEL: Record<string, string> = {
-  DRAFT: 'Borrador',
-  SENT: 'Enviada',
-  ACCEPTED: 'Aceptada',
-  REJECTED: 'Rechazada',
-}
-
-const STATUS_TONE: Record<string, 'neutral' | 'brand' | 'success' | 'danger'> = {
-  DRAFT: 'neutral',
-  SENT: 'brand',
-  ACCEPTED: 'success',
-  REJECTED: 'danger',
-}
 
 export function QuotesSection({ prospectId }: { prospectId: string }) {
   const queryClient = useQueryClient()
@@ -34,16 +20,6 @@ export function QuotesSection({ prospectId }: { prospectId: string }) {
   const listQ = useQuery({
     queryKey: quotesKeys.list({ prospect_id: prospectId }),
     queryFn: () => quotesService.list({ prospect_id: prospectId }),
-  })
-
-  const statusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: Quote['status'] }) => quotesService.changeStatus(id, status),
-    onSuccess: () => {
-      toast.success('Estado actualizado')
-      queryClient.invalidateQueries({ queryKey: quotesKeys.all })
-      queryClient.invalidateQueries({ queryKey: ['prospects'] })
-    },
-    onError: (e) => toast.error(errorMessage(e)),
   })
 
   const deleteMutation = useMutation({
@@ -85,36 +61,18 @@ export function QuotesSection({ prospectId }: { prospectId: string }) {
               <div key={q.id} className="flex items-start gap-3 p-4 text-sm">
                 <div className="flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <Badge tone={STATUS_TONE[q.status]}>{STATUS_LABEL[q.status]}</Badge>
+                    <QuoteStatusBadge quote={q} />
                     <span className="text-xs text-muted-foreground">{formatDate(q.issue_date)}</span>
                   </div>
-                  <p className="mt-1 font-medium text-zinc-900">Total: {formatMoney(Number(q.total))}</p>
-                  <p className="text-xs text-muted-foreground">{q.items.length} ítem{q.items.length !== 1 ? 's' : ''}</p>
+                  <QuoteDetails quote={q} />
                 </div>
                 <div className="flex shrink-0 flex-wrap items-center gap-1">
+                  <QuoteActions quote={q} />
                   {q.status === 'DRAFT' && (
-                    <Button size="sm" variant="outline" onClick={() => statusMutation.mutate({ id: q.id, status: 'SENT' })}>
-                      Enviar
+                    <Button variant="ghost" size="icon-sm" aria-label="Editar" onClick={() => setFormOpen(q)}>
+                      <span className="text-xs font-medium">Editar</span>
                     </Button>
                   )}
-                  {q.status === 'SENT' && (
-                    <>
-                      <Button size="sm" onClick={() => statusMutation.mutate({ id: q.id, status: 'ACCEPTED' })}>
-                        Aceptar
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="text-red-600"
-                        onClick={() => statusMutation.mutate({ id: q.id, status: 'REJECTED' })}
-                      >
-                        Rechazar
-                      </Button>
-                    </>
-                  )}
-                  <Button variant="ghost" size="icon-sm" aria-label="Editar" onClick={() => setFormOpen(q)}>
-                    <span className="text-xs font-medium">Editar</span>
-                  </Button>
                   <Button
                     variant="ghost"
                     size="icon-sm"

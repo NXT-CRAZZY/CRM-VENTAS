@@ -76,7 +76,7 @@ export default function ProductsPage() {
   const chip = (active: boolean) =>
     cn(
       'inline-flex h-9 shrink-0 items-center gap-2 rounded-full border px-3.5 text-[13px] font-medium transition-all duration-150 sm:h-8',
-      active ? 'border-zinc-900 bg-zinc-900 text-white shadow-sm' : 'border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300 hover:text-zinc-900',
+      active ? 'border-ink-900 bg-ink-900 text-white shadow-sm' : 'border-zinc-200 bg-card text-zinc-600 hover:border-zinc-300 hover:text-zinc-900',
     )
 
   return (

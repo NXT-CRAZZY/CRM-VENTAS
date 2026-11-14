@@ -3,7 +3,7 @@ from datetime import date, timedelta
 from fastapi.testclient import TestClient
 
 from tests.api.test_interactions import _create_prospect
-from tests.api.test_opportunities import _stage_id
+from tests.api.test_opportunities import _stage_id, _type_id
 from tests.conftest import API
 
 
@@ -23,6 +23,7 @@ def test_management_dashboard_pipeline_and_sales(client: TestClient, manager_hea
             "prospect_id": prospect["id"],
             "title": "Venta gerencial",
             "stage_id": stage_new,
+            "type_id": _type_id(client, manager_headers, "NUEVO"),
             "estimated_amount": 5000,
             "expected_close_date": (date.today() + timedelta(days=5)).isoformat(),
         },

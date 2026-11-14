@@ -180,9 +180,13 @@ class ProspectFilters(BaseModel):
     relationship_type: RelationshipType | None = None
     owner_id: UUID | None = None
     interest_level_id: UUID | None = None
+    interest_level_code: str | None = Field(default=None, max_length=30)
     priority_id: UUID | None = None
     source_id: UUID | None = None
     tag_ids: list[UUID] = Field(default_factory=list)
+    without_contact_days: int | None = Field(default=None, ge=1, le=365)
+    next_action_today: bool | None = None
+    created_since_days: int | None = Field(default=None, ge=1, le=365)
 
 
 class DuplicateCheckRequest(BaseModel):

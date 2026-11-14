@@ -2,12 +2,15 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus, Trash2 } from 'lucide-react'
 import { Controller, useFieldArray, useForm, type Resolver } from 'react-hook-form'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { errorMessage } from '@/shared/api/errors'
+import { opportunitiesService } from '@/features/opportunities/api/opportunities-service'
 import { productsKeys, productsService } from '@/features/products/api/products-service'
+import { ProspectPicker, type PickedProspect } from '@/features/prospects/components/ProspectPicker'
 import { Button } from '@/shared/ui/button'
 import { Input, Textarea } from '@/shared/ui/input'
+import { Combobox } from '@/shared/ui/combobox'
 import { Select } from '@/shared/ui/menus'
 import { FormField } from '@/shared/ui/page'
 import { Sheet, SheetContent } from '@/shared/ui/sheet'
@@ -41,6 +44,27 @@ export function QuoteFormSheet({
   const queryClient = useQueryClient()
   const isNew = quote === 'new'
   const editing = quote && quote !== 'new' ? quote : null
+
+  // Desde la pestaña Cotizaciones no hay cliente de contexto: se elige con el buscador.
+  const needsProspect = isNew && !prospectId
+  const [pickedProspect, setPickedProspect] = useState<PickedProspect | null>(null)
+  const [prospectError, setProspectError] = useState<string | null>(null)
+  const effectiveProspectId = prospectId || pickedProspect?.id || editing?.prospect.id || ''
+
+  useEffect(() => {
+    if (!quote) {
+      setPickedProspect(null)
+      setProspectError(null)
+    }
+  }, [quote])
+
+  // Oportunidades abiertas del cliente, para ligar la cotización (opcional).
+  const oppsQ = useQuery({
+    queryKey: ['opportunities', 'open-for-quote', effectiveProspectId],
+    queryFn: () => opportunitiesService.list({ prospect_id: effectiveProspectId }),
+    enabled: !!quote && !!effectiveProspectId,
+  })
+  const openOpps = (oppsQ.data?.items ?? []).filter((o) => !['CERRADO_GANADO', 'CERRADO_PERDIDO'].includes(o.stage.code))
 
   const productsQ = useQuery({
     queryKey: productsKeys.list({ status: 'active', page: 1 }),
@@ -92,7 +116,7 @@ export function QuoteFormSheet({
         })),
       }
       if (isNew) {
-        return quotesService.create({ prospect_id: prospectId, ...base })
+        return quotesService.create({ prospect_id: effectiveProspectId, ...base })
       }
       return quotesService.update(editing!.id, base)
     },
@@ -107,7 +131,13 @@ export function QuoteFormSheet({
 
   const productOptions = (productsQ.data?.items ?? []).map((p) => ({
     value: p.id,
-    label: `${p.name} (${formatMoney(Number(p.list_price))})`,
+    label: (
+      <span className="flex flex-col">
+        <span className="whitespace-normal break-words leading-snug">{p.name}</span>
+        <span className="tabular text-xs text-zinc-500">{formatMoney(Number(p.list_price))}</span>
+      </span>
+    ),
+    searchText: `${p.name} ${p.code}`,
   }))
 
   return (
@@ -128,10 +158,58 @@ export function QuoteFormSheet({
       >
         <form
           id="quote-form"
-          onSubmit={form.handleSubmit((d) => save.mutate(d))}
+          onSubmit={form.handleSubmit((d) => {
+            if (needsProspect && !pickedProspect) {
+              setProspectError('Selecciona un cliente')
+              return
+            }
+            save.mutate(d)
+          })}
           className="space-y-5"
           noValidate
         >
+          {needsProspect && (
+            <FormField label="Cliente" required error={prospectError ?? undefined}>
+              {(p) => (
+                <ProspectPicker
+                  id={p.id}
+                  invalid={!!prospectError}
+                  value={pickedProspect}
+                  onChange={(v) => {
+                    setPickedProspect(v)
+                    setProspectError(null)
+                    form.setValue('opportunity_id', null)
+                  }}
+                />
+              )}
+            </FormField>
+          )}
+          {editing && (
+            <p className="text-sm text-zinc-600">
+              Cliente: <span className="font-medium text-zinc-900">{editing.prospect.display_name}</span>
+            </p>
+          )}
+
+          {openOpps.length > 0 && (
+            <FormField label="Oportunidad" optional>
+              {(p) => (
+                <Controller
+                  control={form.control}
+                  name="opportunity_id"
+                  render={({ field }) => (
+                    <Select
+                      {...p}
+                      value={field.value ?? ''}
+                      onValueChange={(v) => field.onChange(v || null)}
+                      options={openOpps.map((o) => ({ value: o.id, label: `${o.title} · ${o.stage.name}` }))}
+                      placeholder="Sin oportunidad"
+                    />
+                  )}
+                />
+              )}
+            </FormField>
+          )}
+
           <div className="grid gap-5 sm:grid-cols-2">
             <FormField label="Fecha de emisión" required error={form.formState.errors.issue_date?.message}>
               {(p) => <Input {...p} type="date" {...form.register('issue_date')} />}
@@ -165,7 +243,7 @@ export function QuoteFormSheet({
                     control={form.control}
                     name={`items.${index}.product_id`}
                     render={({ field }) => (
-                      <Select
+                      <Combobox
                         value={field.value ?? ''}
                         onValueChange={(v) => {
                           field.onChange(v || null)
@@ -176,7 +254,8 @@ export function QuoteFormSheet({
                           }
                         }}
                         options={productOptions}
-                        placeholder="Seleccionar producto…"
+                        placeholder="Buscar producto…"
+                        searchPlaceholder="Escribe para buscar (nombre o código)…"
                         className="flex-1"
                       />
                     )}

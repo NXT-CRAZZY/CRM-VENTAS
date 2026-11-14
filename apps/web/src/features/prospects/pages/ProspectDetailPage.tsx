@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ArrowLeft, Mail, MapPin, Phone, UsersRound } from 'lucide-react'
+import { IdCard, ArrowLeft, Mail, MapPin, Phone, UsersRound } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { toast } from 'sonner'
@@ -174,6 +174,15 @@ export default function ProspectDetailPage() {
           <Card className="space-y-4 p-5 lg:col-span-2">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">Información de contacto</h2>
             <div className="grid gap-4 sm:grid-cols-2">
+              {prospect.document_number && (
+                <div className="flex items-center gap-2 text-sm">
+                  <IdCard className="size-4 text-zinc-400" />
+                  <span>
+                    <span className="text-zinc-500">{prospect.document_type?.name ?? 'Documento'}:</span>{' '}
+                    <span className="tabular font-medium">{prospect.document_number}</span>
+                  </span>
+                </div>
+              )}
               {prospect.email && (
                 <div className="flex items-center gap-2 text-sm">
                   <Mail className="size-4 text-zinc-400" />

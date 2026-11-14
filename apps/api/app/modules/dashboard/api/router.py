@@ -21,7 +21,9 @@ from app.modules.products.infrastructure.models import Product
 from app.modules.prospects.infrastructure.models import Prospect
 from app.modules.quotes.infrastructure.models import Quote, QuoteItem
 from app.modules.rbac.domain.permissions import P
+from app.modules.settings.application.use_cases import SettingsService
 from app.modules.tasks.infrastructure.models import Task
+from app.shared.timeutil import local_day_bounds
 from app.modules.users.infrastructure.models import User
 
 router = APIRouter(tags=["Dashboards"], prefix="/dashboard")
@@ -50,9 +52,12 @@ def sales_dashboard(
     db: DbSession,
     user: Annotated[CurrentUser, Depends(require(P.DASHBOARD_SALES))],
 ) -> SalesDashboardRead:
+    settings = SettingsService(db).get("alerts")
+    no_contact_days = getattr(settings, "no_contact_days", 7)
+
     now = _now_lima()
-    start_of_day = _start_of_day_lima(now)
-    start_of_week = start_of_day - timedelta(days=start_of_day.weekday())
+    start_of_day, end_of_day = local_day_bounds(now)
+    last_7_days = now - timedelta(days=7)
 
     accessible_filter = True
     if P.PROSPECTS_READ_ALL not in user.permission_codes:
@@ -64,7 +69,7 @@ def sales_dashboard(
             Task.assignee_id == user.id,
             Task.status == "PENDING",
             Task.due_at >= start_of_day,
-            Task.due_at < start_of_day + timedelta(days=1),
+            Task.due_at < end_of_day,
             Task.deleted_at.is_(None),
         )
     ) or 0
@@ -81,32 +86,39 @@ def sales_dashboard(
     # Prospectos nuevos asignados esta semana
     new_prospects_this_week = db.scalar(
         select(func.count(Prospect.id)).where(
-            Prospect.created_at >= start_of_week,
+            Prospect.created_at >= last_7_days,
             Prospect.deleted_at.is_(None),
+            Prospect.status == "ACTIVO",
             accessible_filter,
         )
     ) or 0
 
     # Seguimientos programados para hoy (próxima acción)
     follow_ups_today = db.scalar(
-        select(func.count(Prospect.id)).where(
-            Prospect.next_action_at >= start_of_day,
-            Prospect.next_action_at < start_of_day + timedelta(days=1),
+        select(func.count(func.distinct(Task.prospect_id)))
+        .join(Prospect, Prospect.id == Task.prospect_id)
+        .where(
+            Task.status == "PENDING",
+            Task.due_at >= start_of_day,
+            Task.due_at < end_of_day,
+            Task.deleted_at.is_(None),
             Prospect.deleted_at.is_(None),
+            Prospect.status == "ACTIVO",
             accessible_filter,
         )
     ) or 0
 
-    # Sin contacto > 7 días
-    seven_days_ago = now - timedelta(days=7)
+    # Sin contacto > N días
+    no_contact_cutoff = now - timedelta(days=no_contact_days)
     prospects_without_contact = db.scalar(
         select(func.count(Prospect.id)).where(
             Prospect.deleted_at.is_(None),
+            Prospect.status == "ACTIVO",
             Prospect.relationship_type == "PROSPECTO",
             accessible_filter,
             (
                 (Prospect.last_contact_at.is_(None)) |
-                (Prospect.last_contact_at < seven_days_ago)
+                (Prospect.last_contact_at < no_contact_cutoff)
             ),
         )
     ) or 0
@@ -121,12 +133,13 @@ def sales_dashboard(
         select(func.count(Prospect.id)).where(
             Prospect.interest_level_id == high_interest_id,
             Prospect.deleted_at.is_(None),
+            Prospect.status == "ACTIVO",
             Prospect.relationship_type == "PROSPECTO",
             accessible_filter,
         )
     ) or 0
 
-    # Próximas acciones (tareas + next_action_at de prospectos)
+    # Próximas acciones (tareas pendientes del usuario)
     upcoming_tasks = db.scalars(
         select(Task)
         .where(
@@ -139,39 +152,17 @@ def sales_dashboard(
         .limit(5)
     ).all()
 
-    upcoming_prospects = db.scalars(
-        select(Prospect)
-        .where(
-            Prospect.next_action_at >= now,
-            Prospect.deleted_at.is_(None),
-            accessible_filter,
-        )
-        .order_by(Prospect.next_action_at.asc())
-        .limit(5)
-    ).all()
-
     upcoming_actions: list[UpcomingActionRead] = []
     for t in upcoming_tasks:
         upcoming_actions.append(
             UpcomingActionRead(
+                task_id=t.public_id,
                 prospect_id=t.prospect.public_id,
                 prospect_name=t.prospect.display_name,
                 action_type=f"Tarea: {t.title}",
                 due_at=t.due_at,
             )
         )
-    for p in upcoming_prospects:
-        upcoming_actions.append(
-            UpcomingActionRead(
-                prospect_id=p.public_id,
-                prospect_name=p.display_name,
-                action_type=p.next_action_desc or "Próxima acción",
-                due_at=p.next_action_at,
-            )
-        )
-
-    upcoming_actions.sort(key=lambda x: (x.due_at or datetime.max.replace(tzinfo=UTC)))
-    upcoming_actions = upcoming_actions[:5]
 
     return SalesDashboardRead(
         tasks_today=tasks_today,
@@ -179,6 +170,7 @@ def sales_dashboard(
         new_prospects_this_week=new_prospects_this_week,
         follow_ups_today=follow_ups_today,
         prospects_without_contact=prospects_without_contact,
+        no_contact_days=no_contact_days,
         high_interest_prospects=high_interest_prospects,
         upcoming_actions=upcoming_actions,
     )
@@ -348,7 +340,7 @@ def _sales_amount(db: Session, stage_id: int | None, start: date, end: date) -> 
             Opportunity.deleted_at.is_(None),
             Opportunity.stage_id == stage_id,
             Opportunity.actual_close_date >= start,
-            Opportunity.actual_close_date < end,
+            Opportunity.actual_close_date <= end,
         )
     ) or 0
     return float(value)

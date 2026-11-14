@@ -843,6 +843,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/reports/weekly/detail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Weekly Report Detail */
+        get: operations["weekly_report_detail_api_v1_reports_weekly_detail_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/weekly/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Weekly Report Export */
+        get: operations["weekly_report_export_api_v1_reports_weekly_export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/alerts/generate": {
         parameters: {
             query?: never;
@@ -1361,6 +1395,29 @@ export interface components {
             /** Match Type */
             match_type: string;
         };
+        /**
+         * FollowUpTask
+         * @description Pr�xima acci�n de la interacci�n: los mismos campos que una tarea.
+         */
+        FollowUpTask: {
+            /** Title */
+            title: string;
+            /** Description */
+            description?: string | null;
+            /** Assignee Id */
+            assignee_id?: string | null;
+            /** Type Id */
+            type_id?: string | null;
+            /** Priority Id */
+            priority_id?: string | null;
+            /**
+             * Due At
+             * Format: date-time
+             */
+            due_at: string;
+            /** Remind At */
+            remind_at?: string | null;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -1515,8 +1572,6 @@ export interface components {
              * Format: uuid
              */
             channel_id: string;
-            /** Mode Id */
-            mode_id?: string | null;
             /**
              * Result Id
              * Format: uuid
@@ -1528,10 +1583,34 @@ export interface components {
             contact_id?: string | null;
             /** Notes */
             notes?: string | null;
-            /** Next Action Desc */
-            next_action_desc?: string | null;
-            /** Next Action At */
-            next_action_at?: string | null;
+            follow_up_task?: components["schemas"]["FollowUpTask"] | null;
+            /** Opportunity Id */
+            opportunity_id?: string | null;
+            new_opportunity?: components["schemas"]["InteractionNewOpportunity"] | null;
+        };
+        /**
+         * InteractionNewOpportunity
+         * @description Datos para crear una oportunidad nueva desde la interacci�n.
+         */
+        InteractionNewOpportunity: {
+            /** Title */
+            title: string;
+            /**
+             * Type Id
+             * Format: uuid
+             */
+            type_id: string;
+        };
+        /** InteractionOpportunityTiny */
+        InteractionOpportunityTiny: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            stage: components["schemas"]["CatalogOptionTiny"];
         };
         /** InteractionRead */
         InteractionRead: {
@@ -1573,6 +1652,10 @@ export interface components {
             mode: components["schemas"]["CatalogOptionTiny"] | null;
             result: components["schemas"]["CatalogOptionTiny"];
             interest_level: components["schemas"]["CatalogOptionTiny"] | null;
+            follow_up_task?: components["schemas"]["TaskRead"] | null;
+            opportunity?: components["schemas"]["InteractionOpportunityTiny"] | null;
+            /** Opportunity Action */
+            opportunity_action?: string | null;
         };
         /** InteractionUpdate */
         InteractionUpdate: {
@@ -1580,8 +1663,6 @@ export interface components {
             occurred_at?: string | null;
             /** Channel Id */
             channel_id?: string | null;
-            /** Mode Id */
-            mode_id?: string | null;
             /** Result Id */
             result_id?: string | null;
             /** Interest Level Id */
@@ -1590,10 +1671,15 @@ export interface components {
             contact_id?: string | null;
             /** Notes */
             notes?: string | null;
-            /** Next Action Desc */
-            next_action_desc?: string | null;
-            /** Next Action At */
-            next_action_at?: string | null;
+            follow_up_task?: components["schemas"]["FollowUpTask"] | null;
+            /**
+             * Remove Follow Up Task
+             * @default false
+             */
+            remove_follow_up_task: boolean;
+            /** Opportunity Id */
+            opportunity_id?: string | null;
+            new_opportunity?: components["schemas"]["InteractionNewOpportunity"] | null;
         };
         /** LoginRequest */
         LoginRequest: {
@@ -1680,6 +1766,8 @@ export interface components {
             title: string;
             /** Description */
             description: string | null;
+            /** Client Status */
+            client_status: string;
             /** Estimated Amount */
             estimated_amount: string | null;
             /** Probability */
@@ -2286,6 +2374,13 @@ export interface components {
             total: string;
             /** Notes */
             notes: string | null;
+            /** Sent At */
+            sent_at?: string | null;
+            /** Accepted At */
+            accepted_at?: string | null;
+            /** Rejected At */
+            rejected_at?: string | null;
+            reject_reason?: components["schemas"]["CatalogOptionTiny"] | null;
             /**
              * Created At
              * Format: date-time
@@ -2305,6 +2400,13 @@ export interface components {
         QuoteStatusChange: {
             /** Status */
             status: string;
+            /** Reject Reason Id */
+            reject_reason_id?: string | null;
+            /**
+             * Close Opportunity
+             * @default false
+             */
+            close_opportunity: boolean;
         };
         /** QuoteUpdate */
         QuoteUpdate: {
@@ -2394,6 +2496,8 @@ export interface components {
             follow_ups_today: number;
             /** Prospects Without Contact */
             prospects_without_contact: number;
+            /** No Contact Days */
+            no_contact_days: number;
             /** High Interest Prospects */
             high_interest_prospects: number;
             /** Upcoming Actions */
@@ -2593,6 +2697,11 @@ export interface components {
         /** UpcomingActionRead */
         UpcomingActionRead: {
             /**
+             * Task Id
+             * Format: uuid
+             */
+            task_id: string;
+            /**
              * Prospect Id
              * Format: uuid
              */
@@ -2684,6 +2793,31 @@ export interface components {
             /** Error Type */
             type: string;
         };
+        /** WeeklyDetailItem */
+        WeeklyDetailItem: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Prospect Id
+             * Format: uuid
+             */
+            prospect_id: string;
+            /** Prospect Name */
+            prospect_name: string;
+            /** Day */
+            day?: string | null;
+            /** Amount */
+            amount?: number | null;
+            /** Description */
+            description?: string | null;
+            /** Status */
+            status?: string | null;
+            /** Seller */
+            seller?: string | null;
+        };
         /** WeeklyReport */
         WeeklyReport: {
             /**
@@ -2711,6 +2845,8 @@ export interface components {
             new_clients_today: number;
             /** New Clients Month */
             new_clients_month: number;
+            /** Range Label */
+            range_label?: string | null;
             /** Rows */
             rows: components["schemas"]["WeeklyReportRow"][];
         };
@@ -2718,10 +2854,27 @@ export interface components {
         WeeklyReportRow: {
             /** Label */
             label: string;
+            /**
+             * Key
+             * @default
+             */
+            key: string;
+            /**
+             * Kind
+             * @default count
+             */
+            kind: string;
             /** Today */
             today: number;
+            /**
+             * Week
+             * @default 0
+             */
+            week: number;
             /** Month */
             month: number;
+            /** Range */
+            range?: number | null;
         };
     };
     responses: never;
@@ -3689,8 +3842,13 @@ export interface operations {
                 relationship_type?: string | null;
                 owner_id?: string | null;
                 interest_level_id?: string | null;
+                /** @description C�digo del nivel de inter�s (ej. ALTO) */
+                interest_level_code?: string | null;
                 priority_id?: string | null;
                 source_id?: string | null;
+                without_contact_days?: number | null;
+                next_action_today?: boolean | null;
+                created_since_days?: number | null;
                 /** @description N�mero de p�gina (desde 1) */
                 page?: number;
                 /** @description Registros por p�gina */
@@ -4244,8 +4402,13 @@ export interface operations {
             query?: {
                 status?: string | null;
                 assignee_id?: string | null;
+                prospect_id?: string | null;
                 due_before?: string | null;
                 due_after?: string | null;
+                search?: string | null;
+                type_id?: string | null;
+                priority_id?: string | null;
+                sort?: "due_asc" | "due_desc" | "newest" | "priority";
                 /** @description N�mero de p�gina (desde 1) */
                 page?: number;
                 /** @description Registros por p�gina */
@@ -4552,6 +4715,12 @@ export interface operations {
                 status?: string | null;
                 prospect_id?: string | null;
                 opportunity_id?: string | null;
+                search?: string | null;
+                date_from?: string | null;
+                date_to?: string | null;
+                owner_id?: string | null;
+                product_id?: string | null;
+                sort?: "newest" | "oldest" | "amount_desc" | "amount_asc" | "expiring";
                 /** @description N�mero de p�gina (desde 1) */
                 page?: number;
                 /** @description Registros por p�gina */
@@ -4836,6 +5005,11 @@ export interface operations {
         parameters: {
             query?: {
                 date?: string | null;
+                date_from?: string | null;
+                date_to?: string | null;
+                seller_id?: string | null;
+                product_id?: string | null;
+                type_id?: string | null;
             };
             header?: never;
             path?: never;
@@ -4850,6 +5024,80 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["WeeklyReport"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    weekly_report_detail_api_v1_reports_weekly_detail_get: {
+        parameters: {
+            query: {
+                key: string;
+                period?: string;
+                date?: string | null;
+                date_from?: string | null;
+                date_to?: string | null;
+                seller_id?: string | null;
+                product_id?: string | null;
+                type_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeeklyDetailItem"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    weekly_report_export_api_v1_reports_weekly_export_get: {
+        parameters: {
+            query?: {
+                date?: string | null;
+                date_from?: string | null;
+                date_to?: string | null;
+                seller_id?: string | null;
+                product_id?: string | null;
+                type_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */

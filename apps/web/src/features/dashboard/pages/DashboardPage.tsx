@@ -16,6 +16,7 @@ import { useQuery } from '@tanstack/react-query'
 import { P, usePermissions } from '@/shared/auth/permissions'
 import { useSessionStore } from '@/shared/auth/session-store'
 import { greeting, formatDateTime } from '@/shared/lib/format'
+import { pendingTabFor } from '@/features/tasks/model/task-tabs'
 import { fadeUp, stagger } from '@/shared/lib/motion'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/button'
@@ -76,7 +77,7 @@ export function DashboardPage() {
   })
 
   const shortcuts = [
-    { to: '/productos', label: 'Catálogo de productos', hint: '31 productos y servicios con precios vigentes', permission: P.PRODUCTS_READ, icon: Package },
+    { to: '/productos', label: 'Catálogo de productos', hint: 'Productos y servicios con precios vigentes', permission: P.PRODUCTS_READ, icon: Package },
     { to: '/admin/usuarios', label: 'Equipo comercial', hint: 'Crea usuarios y asigna roles', permission: P.USERS_MANAGE, icon: UsersRound },
     { to: '/admin/catalogos', label: 'Catálogos', hint: 'Formas de contacto, interés, motivos de pérdida…', permission: P.CATALOGS_MANAGE, icon: ListChecks },
   ].filter((s) => can(s.permission))
@@ -93,22 +94,22 @@ export function DashboardPage() {
       {d && (
         <motion.div variants={stagger} initial="hidden" animate="show" className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <motion.div variants={fadeUp}>
-            <KpiCard label="Tareas hoy" value={d.tasks_today} icon={ListChecks} tone="brand" href="/prospectos" />
+            <KpiCard label="Tareas hoy" value={d.tasks_today} icon={ListChecks} tone="brand" href={`/tareas?due=today&assignee=${user?.id ?? ""}`} />
           </motion.div>
           <motion.div variants={fadeUp}>
-            <KpiCard label="Tareas vencidas" value={d.tasks_overdue} icon={AlertTriangle} tone="danger" href="/prospectos" />
+            <KpiCard label="Tareas vencidas" value={d.tasks_overdue} icon={AlertTriangle} tone="danger" href={`/tareas?due=overdue&assignee=${user?.id ?? ""}`} />
           </motion.div>
           <motion.div variants={fadeUp}>
-            <KpiCard label="Nuevos esta semana" value={d.new_prospects_this_week} icon={UserPlus} tone="neutral" href="/prospectos" />
+            <KpiCard label="Nuevos últimos 7 días" value={d.new_prospects_this_week} icon={UserPlus} tone="neutral" href="/prospectos?created_since_days=7" />
           </motion.div>
           <motion.div variants={fadeUp}>
-            <KpiCard label="Seguimientos hoy" value={d.follow_ups_today} icon={Phone} tone="brand" href="/prospectos" />
+            <KpiCard label="Seguimientos hoy" value={d.follow_ups_today} icon={Phone} tone="brand" href="/prospectos?next_action_today=true" />
           </motion.div>
           <motion.div variants={fadeUp}>
-            <KpiCard label="Sin contacto > 7 días" value={d.prospects_without_contact} icon={Clock} tone="warning" href="/prospectos" />
+            <KpiCard label={`Sin contacto > ${d.no_contact_days} días`} value={d.prospects_without_contact} icon={Clock} tone="warning" href={`/prospectos?without_contact_days=${d.no_contact_days}`} />
           </motion.div>
           <motion.div variants={fadeUp}>
-            <KpiCard label="Alto interés" value={d.high_interest_prospects} icon={Flame} tone="brand" href="/prospectos" />
+            <KpiCard label="Alto interés" value={d.high_interest_prospects} icon={Flame} tone="brand" href="/prospectos?interest_level_code=ALTO&relationship_type=PROSPECTO" />
           </motion.div>
         </motion.div>
       )}
@@ -117,7 +118,7 @@ export function DashboardPage() {
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Próximas acciones</CardTitle>
-            <CardDescription>Tareas y recordatorios programados.</CardDescription>
+            <CardDescription>Tareas programadas.</CardDescription>
           </CardHeader>
           <CardContent>
             {!d || dashboardQ.isLoading ? (
@@ -130,7 +131,7 @@ export function DashboardPage() {
             ) : (
               <div className="divide-y divide-zinc-100">
                 {d.upcoming_actions.map((a) => (
-                  <div key={`${a.prospect_id}-${a.action_type}`} className="flex items-start gap-3 py-3 text-sm">
+                  <div key={a.task_id} className="flex items-start gap-3 py-3 text-sm">
                     <div className="mt-0.5 size-2 rounded-full bg-brand-500" />
                     <div className="flex-1">
                       <p className="font-medium text-zinc-900">{a.prospect_name}</p>
@@ -138,7 +139,7 @@ export function DashboardPage() {
                       {a.due_at && <p className="text-xs text-muted-foreground">{formatDateTime(a.due_at)}</p>}
                     </div>
                     <Button size="sm" variant="outline" asChild>
-                      <Link to={`/prospectos/${a.prospect_id}`}>Ver ficha</Link>
+                      <Link to={`/tareas?due=${pendingTabFor(a.due_at)}&task=${a.task_id}`}>Ver tarea</Link>
                     </Button>
                   </div>
                 ))}
@@ -153,7 +154,7 @@ export function DashboardPage() {
           </CardHeader>
           <CardContent className="space-y-2">
             <Button className="w-full justify-start gap-2" asChild>
-              <Link to="/prospectos">
+              <Link to="/prospectos?action=new">
                 <UserPlus className="size-4" /> Nuevo prospecto
               </Link>
             </Button>

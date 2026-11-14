@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -63,8 +63,12 @@ class ImportPreview(BaseModel):
 
 class WeeklyReportRow(BaseModel):
     label: str
+    key: str = ""  # para abrir el detalle: quotes | sales | sales:<tipo> | sales:none | clients
+    kind: str = "count"  # "count" (unidades) | "money" (soles)
     today: int | float
+    week: int | float = 0
     month: int | float
+    range: int | float | None = None  # solo si se eligió un rango de fechas
 
 
 class WeeklyReport(BaseModel):
@@ -79,8 +83,25 @@ class WeeklyReport(BaseModel):
     sales_new_month: float
     new_clients_today: int
     new_clients_month: int
+    range_label: str | None = None
     rows: list[WeeklyReportRow]
 
 
 class WeeklyReportFilters(BaseModel):
     date: str | None = Field(default=None, pattern=r"^\d{4}-\d{2}-\d{2}$")
+    date_from: str | None = Field(default=None, pattern=r"^\d{4}-\d{2}-\d{2}$")
+    date_to: str | None = Field(default=None, pattern=r"^\d{4}-\d{2}-\d{2}$")
+    seller_id: str | None = None
+    product_id: str | None = None
+    type_id: str | None = None
+
+
+class WeeklyDetailItem(BaseModel):
+    id: UUID
+    prospect_id: UUID
+    prospect_name: str
+    day: date | None = None
+    amount: float | None = None
+    description: str | None = None
+    status: str | None = None
+    seller: str | None = None

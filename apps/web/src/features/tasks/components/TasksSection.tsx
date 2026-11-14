@@ -9,7 +9,7 @@ import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import { ConfirmDialog } from '@/shared/ui/misc'
 
-import { tasksKeys, tasksService, type Task } from '../api/tasks-service'
+import { invalidateTaskViews, tasksKeys, tasksService, type Task } from '../api/tasks-service'
 import { TaskFormSheet } from './TaskFormSheet'
 
 export function TasksSection({ prospectId }: { prospectId: string }) {
@@ -18,14 +18,14 @@ export function TasksSection({ prospectId }: { prospectId: string }) {
   const [deleting, setDeleting] = useState<Task | null>(null)
 
   const listQ = useQuery({
-    queryKey: tasksKeys.list({}),
-    queryFn: () => tasksService.list({}),
+    queryKey: tasksKeys.list({ prospect_id: prospectId }),
+    queryFn: () => tasksService.list({ prospect_id: prospectId }),
   })
 
   const statusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: Task['status'] }) =>
       tasksService.changeStatus(id, status),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: tasksKeys.all }),
+    onSuccess: () => invalidateTaskViews(queryClient),
     onError: (e) => toast.error(errorMessage(e)),
   })
 
@@ -33,13 +33,13 @@ export function TasksSection({ prospectId }: { prospectId: string }) {
     mutationFn: (task: Task) => tasksService.delete(task.id),
     onSuccess: () => {
       toast.success('Tarea eliminada')
-      queryClient.invalidateQueries({ queryKey: tasksKeys.all })
+      invalidateTaskViews(queryClient)
       setDeleting(null)
     },
     onError: (e) => toast.error(errorMessage(e)),
   })
 
-  const tasks = (listQ.data?.items ?? []).filter((t) => t.prospect?.id === prospectId)
+  const tasks = listQ.data?.items ?? []
   const pending = tasks.filter((t) => t.status === 'PENDING')
   const done = tasks.filter((t) => t.status === 'DONE')
 

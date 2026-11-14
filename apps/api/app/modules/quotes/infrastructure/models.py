@@ -37,8 +37,17 @@ class Quote(IdMixin, TimestampMixin, Base):
     tax: Mapped[float] = mapped_column(Numeric(14, 2), default=0, nullable=False)
     total: Mapped[float] = mapped_column(Numeric(14, 2), default=0, nullable=False)
     notes: Mapped[str | None] = mapped_column(Text)
+    sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    accepted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    rejected_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    reject_reason_id: Mapped[int | None] = mapped_column(
+        BigInteger, ForeignKey("catalog_options.id", ondelete="SET NULL"), nullable=True
+    )
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True)
 
+    reject_reason: Mapped["CatalogOption | None"] = relationship(
+        "CatalogOption", foreign_keys=[reject_reason_id], lazy="joined"
+    )
     prospect: Mapped["Prospect"] = relationship("Prospect", lazy="joined")
     opportunity: Mapped["Opportunity | None"] = relationship("Opportunity", lazy="joined")
     items: Mapped[list["QuoteItem"]] = relationship(

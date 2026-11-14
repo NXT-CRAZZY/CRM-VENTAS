@@ -10,11 +10,13 @@ class SalesDashboardRead(BaseModel):
     new_prospects_this_week: int
     follow_ups_today: int
     prospects_without_contact: int
+    no_contact_days: int
     high_interest_prospects: int
     upcoming_actions: list["UpcomingActionRead"]
 
 
 class UpcomingActionRead(BaseModel):
+    task_id: UUID
     prospect_id: UUID
     prospect_name: str
     action_type: str

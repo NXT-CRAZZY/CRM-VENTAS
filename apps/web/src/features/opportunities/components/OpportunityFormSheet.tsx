@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Controller, useForm, type Resolver } from 'react-hook-form'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { useCatalogBundle } from '@/shared/api/catalogs'
 import { useActiveUsers } from '@/features/admin/users/api/users-service'
@@ -12,6 +12,7 @@ import { Select } from '@/shared/ui/menus'
 import { FormField } from '@/shared/ui/page'
 import { Sheet, SheetContent } from '@/shared/ui/sheet'
 
+import { ProspectPicker, type PickedProspect } from '@/features/prospects/components/ProspectPicker'
 import { opportunitiesKeys, opportunitiesService, type Opportunity } from '../api/opportunities-service'
 import { opportunityFormSchema, type OpportunityFormValues } from '../model/schemas'
 
@@ -44,6 +45,11 @@ export function OpportunityFormSheet({
   const catalogs = useCatalogBundle(['pipeline_stage', 'opportunity_type', 'loss_reason'])
   const users = useActiveUsers(true)
 
+  // Desde el Pipeline no hay prospecto de contexto: se elige con el buscador.
+  const needsProspect = isNew && !prospectId
+  const [pickedProspect, setPickedProspect] = useState<PickedProspect | null>(null)
+  const [prospectError, setProspectError] = useState<string | null>(null)
+
   const defaultValues: OpportunityFormValues = useMemo(
     () => ({
       title: editing?.title ?? '',
@@ -66,6 +72,8 @@ export function OpportunityFormSheet({
   })
 
   useEffect(() => {
+    setPickedProspect(null)
+    setProspectError(null)
     if (opportunity) form.reset(defaultValues)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opportunity, defaultValues])
@@ -77,14 +85,14 @@ export function OpportunityFormSheet({
         description: emptyToNull(values.description),
         stage_id: values.stage_id,
         type_id: emptyToNull(values.type_id),
-        loss_reason_id: emptyToNull(values.loss_reason_id),
+        loss_reason_id: isLostStage ? emptyToNull(values.loss_reason_id) : null,
         owner_id: emptyToNull(values.owner_id),
         estimated_amount: values.estimated_amount ?? null,
         probability: values.probability ?? null,
         expected_close_date: values.expected_close_date || null,
       }
       if (isNew) {
-        return opportunitiesService.create({ prospect_id: prospectId, ...base })
+        return opportunitiesService.create({ prospect_id: prospectId || pickedProspect!.id, ...base })
       }
       return opportunitiesService.update(editing!.id, base)
     },
@@ -96,6 +104,15 @@ export function OpportunityFormSheet({
     onError: (e) => toast.error(errorMessage(e)),
   })
 
+  // "Motivo de pérdida" solo aplica en la etapa Cerrado perdido.
+  const selectedStageId = form.watch('stage_id')
+  const isLostStage = (catalogs.data?.pipeline_stage ?? []).some(
+    (o) => o.id === selectedStageId && o.code === 'CERRADO_PERDIDO',
+  )
+  useEffect(() => {
+    if (!isLostStage && form.getValues('loss_reason_id')) form.setValue('loss_reason_id', null)
+  }, [isLostStage, form])
+
   const selectOptions = (code: 'pipeline_stage' | 'opportunity_type' | 'loss_reason') =>
     (catalogs.data?.[code] ?? []).map((o) => ({ value: o.id, label: o.name }))
 
@@ -103,7 +120,7 @@ export function OpportunityFormSheet({
     <Sheet open={!!opportunity} onOpenChange={(o) => !o && onClose()}>
       <SheetContent
         title={isNew ? 'Nueva oportunidad' : 'Editar oportunidad'}
-        description={isNew ? 'Registra una oportunidad de venta para este prospecto.' : editing?.title}
+        description={isNew ? (needsProspect ? 'Elige el prospecto y registra su oportunidad de venta.' : 'Registra una oportunidad de venta para este prospecto.') : editing?.title}
         footer={
           <>
             <Button variant="outline" onClick={onClose}>
@@ -117,10 +134,36 @@ export function OpportunityFormSheet({
       >
         <form
           id="opportunity-form"
-          onSubmit={form.handleSubmit((d) => save.mutate(d))}
+          onSubmit={form.handleSubmit((d) => {
+            if (needsProspect && !pickedProspect) {
+              setProspectError('Selecciona un prospecto')
+              return
+            }
+            if (!isLostStage && !d.type_id) {
+              form.setError('type_id', { message: 'Indica qué se vende' })
+              return
+            }
+            save.mutate(d)
+          })}
           className="space-y-5"
           noValidate
         >
+          {needsProspect && (
+            <FormField label="Prospecto" required error={prospectError ?? undefined}>
+              {(p) => (
+                <ProspectPicker
+                  id={p.id}
+                  invalid={!!prospectError}
+                  value={pickedProspect}
+                  onChange={(v) => {
+                    setPickedProspect(v)
+                    setProspectError(null)
+                  }}
+                />
+              )}
+            </FormField>
+          )}
+
           <FormField label="Título" required error={form.formState.errors.title?.message}>
             {(p) => <Input {...p} {...form.register('title')} />}
           </FormField>
@@ -148,7 +191,7 @@ export function OpportunityFormSheet({
               )}
             </FormField>
 
-            <FormField label="Tipo" optional error={form.formState.errors.type_id?.message}>
+            <FormField label="Qué se vende" required={!isLostStage} optional={isLostStage} error={form.formState.errors.type_id?.message}>
               {(p) => (
                 <Controller
                   control={form.control}
@@ -157,9 +200,12 @@ export function OpportunityFormSheet({
                     <Select
                       {...p}
                       value={field.value ?? ''}
-                      onValueChange={(v) => field.onChange(v || null)}
+                      onValueChange={(v) => {
+                        field.onChange(v || null)
+                        form.clearErrors('type_id')
+                      }}
                       options={selectOptions('opportunity_type')}
-                      placeholder="—"
+                      placeholder={isLostStage ? '—' : 'Selecciona…'}
                     />
                   )}
                 />
@@ -186,6 +232,7 @@ export function OpportunityFormSheet({
               )}
             </FormField>
 
+            {isLostStage && (
             <FormField label="Motivo de pérdida" optional error={form.formState.errors.loss_reason_id?.message}>
               {(p) => (
                 <Controller
@@ -203,6 +250,7 @@ export function OpportunityFormSheet({
                 />
               )}
             </FormField>
+            )}
           </div>
 
           <div className="grid gap-5 sm:grid-cols-3">

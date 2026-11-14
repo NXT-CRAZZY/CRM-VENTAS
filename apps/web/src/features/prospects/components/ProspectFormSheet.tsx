@@ -453,7 +453,7 @@ export function ProspectFormSheet({
                 />
               )}
             </FormField>
-            <FormField label="Canal de adquisición" optional error={errors.acquisition_channel_id?.message}>
+            <FormField label="Canal de contacto inicial" optional error={errors.acquisition_channel_id?.message}>
               {(p) => (
                 <Controller
                   control={form.control}

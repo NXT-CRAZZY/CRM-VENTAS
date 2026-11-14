@@ -1,7 +1,7 @@
 from typing import Protocol
 from uuid import UUID
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.modules.catalogs.infrastructure.models import Catalog, CatalogOption
@@ -21,8 +21,12 @@ class OpportunityRepository(Protocol):
     def refresh(self, opportunity: Opportunity) -> None: ...
     def get_prospect_id(self, public_id: UUID) -> int | None: ...
     def get_user_id(self, public_id: UUID) -> int | None: ...
+    def get_prospect_relationship(self, prospect_id: int) -> str | None: ...
     def get_catalog_option_id(self, public_id: UUID) -> int | None: ...
     def get_catalog_option_id_by_code(self, catalog_code: str, option_code: str) -> int | None: ...
+    def list_open_for_prospect(self, prospect_id: int) -> list[Opportunity]: ...
+    def get_latest_for_prospect(self, prospect_id: int) -> Opportunity | None: ...
+    def reopen_accepted_quotes(self, opportunity_id: int) -> None: ...
 
 
 class SqlOpportunityRepository:
@@ -49,7 +53,15 @@ class SqlOpportunityRepository:
 
         stmt = self._base_query()
         if P.PROSPECTS_READ_ALL not in user.permission_codes:
-            stmt = stmt.where(Opportunity.owner_id == user.id)
+            from app.modules.prospects.infrastructure.models import Prospect
+
+            # Ve las suyas y las de los prospectos que atiende (aunque la oportunidad no tenga responsable).
+            stmt = stmt.where(
+                or_(
+                    Opportunity.owner_id == user.id,
+                    Opportunity.prospect_id.in_(select(Prospect.id).where(Prospect.owner_id == user.id)),
+                )
+            )
         if filters.get("stage_id"):
             stmt = stmt.where(Opportunity.stage_id == filters["stage_id"])
         if filters.get("owner_id"):
@@ -61,7 +73,12 @@ class SqlOpportunityRepository:
         if filters.get("expected_close_after"):
             stmt = stmt.where(Opportunity.expected_close_date >= filters["expected_close_after"])
         if filters.get("prospect_id"):
-            stmt = stmt.where(Opportunity.prospect_id == filters["prospect_id"])
+            from app.modules.prospects.infrastructure.models import Prospect
+
+            stmt = stmt.where(
+                Opportunity.prospect_id
+                == select(Prospect.id).where(Prospect.public_id == filters["prospect_id"]).scalar_subquery()
+            )
         stmt = stmt.order_by(Opportunity.created_at.desc())
         return paginate(self.s, stmt, params)
 
@@ -86,6 +103,11 @@ class SqlOpportunityRepository:
 
         return self.s.scalar(select(Prospect.id).where(Prospect.public_id == public_id))
 
+    def get_prospect_relationship(self, prospect_id: int) -> str | None:
+        from app.modules.prospects.infrastructure.models import Prospect
+
+        return self.s.scalar(select(Prospect.relationship_type).where(Prospect.id == prospect_id))
+
     def get_user_id(self, public_id: UUID) -> int | None:
         return self.s.scalar(select(User.id).where(User.public_id == public_id))
 
@@ -97,4 +119,39 @@ class SqlOpportunityRepository:
             select(CatalogOption.id)
             .join(Catalog, Catalog.id == CatalogOption.catalog_id)
             .where(Catalog.code == catalog_code, CatalogOption.code == option_code)
+        )
+
+    def list_open_for_prospect(self, prospect_id: int) -> list[Opportunity]:
+        """Oportunidades del prospecto que aún no están cerradas (la más reciente primero)."""
+        return list(
+            self.s.scalars(
+                self._base_query()
+                .join(CatalogOption, CatalogOption.id == Opportunity.stage_id)
+                .where(
+                    Opportunity.prospect_id == prospect_id,
+                    CatalogOption.code.not_in(("CERRADO_GANADO", "CERRADO_PERDIDO")),
+                )
+                .order_by(Opportunity.created_at.desc(), Opportunity.id.desc())
+            ).unique()
+        )
+
+    def reopen_accepted_quotes(self, opportunity_id: int) -> None:
+        from app.modules.quotes.infrastructure.models import Quote
+
+        quotes = self.s.scalars(
+            select(Quote).where(
+                Quote.opportunity_id == opportunity_id, Quote.status == "ACCEPTED", Quote.deleted_at.is_(None)
+            )
+        ).unique().all()
+        for q in quotes:
+            q.status = "SENT"
+            q.accepted_at = None
+
+    def get_latest_for_prospect(self, prospect_id: int) -> Opportunity | None:
+        """Oportunidad más reciente del prospecto (abierta o cerrada)."""
+        return self.s.scalar(
+            self._base_query()
+            .where(Opportunity.prospect_id == prospect_id)
+            .order_by(Opportunity.created_at.desc(), Opportunity.id.desc())
+            .limit(1)
         )

@@ -65,6 +65,7 @@ export function OpportunitiesSection({ prospectId }: { prospectId: string }) {
                   {o.description && <p className="mt-0.5 text-zinc-600">{o.description}</p>}
                   <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                     <Badge tone="neutral">{o.stage.name}</Badge>
+                    <Badge tone={o.client_status === 'EXISTENTE' ? 'info' : 'neutral'}>{o.client_status === 'EXISTENTE' ? 'Cliente existente' : 'Cliente nuevo'}</Badge>
                     {o.type && <Badge tone="neutral">{o.type.name}</Badge>}
                     {o.estimated_amount !== null && o.estimated_amount !== undefined && (
                       <span>{formatMoney(Number(o.estimated_amount))}</span>

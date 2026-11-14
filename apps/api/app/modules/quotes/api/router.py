@@ -1,4 +1,5 @@
-from typing import Annotated
+from datetime import date
+from typing import Annotated, Literal, cast
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
@@ -14,13 +15,16 @@ from app.modules.quotes.schemas import (
     QuoteUpdate,
 )
 from app.modules.rbac.domain.permissions import P
+from app.modules.settings.application.use_cases import SettingsService
+from app.modules.settings.domain.registry import AlertSettings
 from app.shared.pagination import Page, PageParams, page_params
 
 router = APIRouter(tags=["Cotizaciones"])
 
 
 def _service(db: DbSession, audit: Audit) -> QuoteService:
-    return QuoteService(SqlQuoteRepository(db), audit)
+    settings = cast(AlertSettings, SettingsService(db).get("alerts"))
+    return QuoteService(SqlQuoteRepository(db), audit, settings)
 
 
 Service = Annotated[QuoteService, Depends(_service)]
@@ -34,11 +38,23 @@ def list_quotes(
     status: str | None = None,
     prospect_id: UUID | None = None,
     opportunity_id: UUID | None = None,
+    search: str | None = None,
+    date_from: date | None = None,
+    date_to: date | None = None,
+    owner_id: UUID | None = None,
+    product_id: UUID | None = None,
+    sort: Literal["newest", "oldest", "amount_desc", "amount_asc", "expiring"] = "newest",
 ) -> Page[QuoteRead]:
     filters = {
         "status": status,
         "prospect_id": prospect_id,
         "opportunity_id": opportunity_id,
+        "search": search,
+        "date_from": date_from,
+        "date_to": date_to,
+        "owner_id": owner_id,
+        "product_id": product_id,
+        "sort": sort,
     }
     return service.list_quotes({k: v for k, v in filters.items() if v is not None}, params, user)
 
